@@ -13,6 +13,7 @@ repositories {
 dependencies {
 	testImplementation(kotlin("test"))
 	testImplementation("org.junit.jupiter:junit-jupiter-api:$junitversion")
+	testImplementation("org.junit.jupiter:junit-jupiter-params:$junitversion")
 	testImplementation("org.assertj:assertj-core:3.27.0")
 }
 

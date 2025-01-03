@@ -26,15 +26,3 @@ private fun subsequence(substring: String, line: String): Boolean {
 
 	return substring == sb.toString()
 }
-
-
-
-//for (i in line.indices) {
-//	for (j in i until substring.length) {
-//		if (line[j] == substring[i]) {
-//			sb.append(line[j])
-//			break
-//		}
-//	}
-//	if (substring.length == sb.length) break
-//}
