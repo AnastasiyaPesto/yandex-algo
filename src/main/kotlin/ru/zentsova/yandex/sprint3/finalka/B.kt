@@ -15,19 +15,17 @@ fun main() {
 	val interns = reader.readInterns(internNums)
 }
 
-private fun BufferedReader.readInterns(n: Int): MutableList<Intern> {
-	return (0 until n).map {
-		val (login, tasksCount, penaltiesCount) = readLine().split(" ")
-		Intern(
-			login = login,
-			taskCount = tasksCount.toInt(),
-			penaltyCount = penaltiesCount.toInt(),
-		)
-	}.toMutableList()
+private fun BufferedReader.readInterns(n: Int) = (0 until n).map {
+	val (login, tasksCount, penaltiesCount) = readLine().split(" ")
+	Intern(
+		login = login,
+		taskCount = tasksCount.toInt(),
+		penaltyCount = penaltiesCount.toInt(),
+	)
 }
 
 private fun quickSortInPlace(interns: MutableList<Intern>, left: Int, right: Int) {
 
 }
 
-private fun BufferedReader.readInt() = this.readLine().toInt()
+private fun BufferedReader.readInt() = readLine().toInt()

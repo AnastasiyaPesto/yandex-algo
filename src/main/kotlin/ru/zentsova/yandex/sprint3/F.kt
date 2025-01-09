@@ -1,38 +1,68 @@
 package ru.zentsova.yandex.sprint3
 
-import java.io.BufferedReader
-import java.io.InputStreamReader
-
-private val DICT = mapOf(
-	'2' to "abc",
-	'3' to "def",
-	'4' to "ghi",
-	'5' to "jkl",
-	'6' to "mno",
-	'7' to "pqrs",
-	'8' to "tuv",
-	'9' to "wxyz"
-)
-
 fun main() {
-	val reader = BufferedReader(InputStreamReader(System.`in`))
-	val numbers = reader.readStr()
-
-	if (numbers.length == 1)
-		println(DICT[numbers[0]])
-
-	generateCombination(numbers, 0, "")
+  readInt()
+	val array = readIntArray()
+	println(largestTrianglePerimeter(array))
 }
 
-private fun generateCombination(numbers: String, i: Int, currentWord: String) {
-	if (i == numbers.length) {
-		print("$currentWord ")
-		return
+fun largestTrianglePerimeter(array: IntArray): Int {
+	val arraySorted = reverseMergeSort(array)
+
+	var i = 0
+	var j = 1
+	var k = 2
+	while (k < arraySorted.size) {
+		if (arraySorted[i] < arraySorted[j] + arraySorted[k]) {
+			return arraySorted[i] + arraySorted[j] + arraySorted[k]
+		}
+		i++
+		j++
+		k++
 	}
-	val btnStr = DICT[numbers[i]]
-	for (j in 0 until btnStr!!.length) {
-		generateCombination(numbers, i + 1, currentWord + btnStr[j])
-	}
+
+	return 0
 }
 
-private fun BufferedReader.readStr() = this.readLine()
+private fun reverseMergeSort(array: IntArray): IntArray {
+	if (array.size < 2) return array
+
+	val left = reverseMergeSort(array.sliceArray(0 until array.size / 2))
+	val right = reverseMergeSort(array.sliceArray(array.size / 2 until array.size))
+
+	val result = IntArray(array.size)
+
+	var l = 0
+	var r = 0
+	var i = 0
+	while (l < left.size && r < right.size) {
+		if (left[l] >= right[r]) {
+			result[i] = left[l]
+			l++
+		} else {
+			result[i] = right[r]
+			r++
+		}
+		i++
+	}
+
+	while (l < left.size) {
+		result[i] = left[l]
+		i++
+		l++
+	}
+
+	while (r < right.size) {
+		result[i] = right[r]
+		i++
+		r++
+	}
+
+	return result
+}
+
+private fun readInt() = readStr().toInt()
+private fun readStr() = readln()
+private fun readStrings() = readStr().split(" ")
+private fun readInts() = readStrings().map { it.toInt() }
+private fun readIntArray() = readInts().toIntArray()

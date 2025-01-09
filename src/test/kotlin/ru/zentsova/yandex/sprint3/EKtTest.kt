@@ -9,7 +9,7 @@ import java.util.stream.Stream
 class EKtTest {
 
 	@ParameterizedTest
-	@MethodSource("arraysProvider")
+	@MethodSource("arrayProvider")
 	fun largestNumberHousesToBuy(houseCosts: IntArray, money: Int, expected: Int) {
 		val actual = largestNumberHousesToBuy(houseCosts, money)
 		assertThat(actual).isEqualTo(expected)
@@ -17,7 +17,7 @@ class EKtTest {
 
 	companion object {
 		@JvmStatic
-		fun arraysProvider(): Stream<Arguments> {
+		fun arrayProvider(): Stream<Arguments> {
 			return Stream.of(
 				Arguments.arguments(intArrayOf(999, 999, 999), 300, 0),
 				Arguments.arguments(intArrayOf(350, 999, 200), 1000, 2),
