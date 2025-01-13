@@ -3,8 +3,8 @@ package ru.zentsova.yandex.sprint3.finalka
 /*
 -- Спринт 3. Финалка. Б. Эффективная быстрая сортировка --
 Ссылка на удачную посылку: https://contest.yandex.ru/contest/23815/run-report/131271817/
-Ссылка на удачную посылку (поле 1-ого ревью):
-https://contest.yandex.ru/contest/23815/run-report/131417732/
+Ссылка на удачную посылку (поcле 1-ого ревью):
+https://contest.yandex.ru/contest/23815/run-report/131420626/
 
 -- ПРИНЦИП РАБОТЫ --
 Реализация быстрой сортировки "in-place".
