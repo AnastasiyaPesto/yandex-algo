@@ -3,6 +3,8 @@ package ru.zentsova.yandex.sprint3.finalka
 /*
 -- Спринт 3. Финалка. А. Поиск в сломанном массиве --
 Ссылка на удачную посылку: https://contest.yandex.ru/contest/23815/run-report/107304711/
+Ссылка на удачную посылку (поле 1-ого ревью):
+https://contest.yandex.ru/contest/23815/run-report/131371549/
 
 -- ПРИНЦИП РАБОТЫ --
 1. Так же как и в бинарном поиске, в первую очередь проверяем  значение по индексу mid
@@ -32,21 +34,21 @@ O(1) - так как храним исходный массив, ищем в н�
 object Solution {
   fun brokenSearch(arr: IntArray, k: Int): Int {
     var left = 0
-    var right = arr.size - 1
+    var right = arr.lastIndex
 
     while (left <= right) {
       val mid = left + (right - left) / 2
       when {
         arr[mid] == k -> return mid
         arr[left] <= arr[mid] -> {
-          if (arr[left] <= k && k < arr[mid]) {
+          if (k in arr[left]..arr[mid]) {
             right = mid - 1
           } else {
             left = mid + 1
           }
         }
         else -> {
-          if (arr[mid] < k && k <= arr[right]) {
+          if (k in arr[mid]..arr[right]) {
             left = mid + 1
           } else {
             right = mid - 1

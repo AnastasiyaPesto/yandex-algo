@@ -3,6 +3,7 @@ package ru.zentsova.yandex.sprint3.finalka
 /*
 -- Спринт 3. Финалка. Б. Эффективная быстрая сортировка --
 Ссылка на удачную посылку: https://contest.yandex.ru/contest/23815/run-report/131271817/
+Ссылка на удачную посылку (поле 1-ого ревью):
 
 -- ПРИНЦИП РАБОТЫ --
 Реализация быстрой сортировки "in-place".
@@ -28,6 +29,8 @@ package ru.zentsova.yandex.sprint3.finalka
 
 -- ВРЕМЕННАЯ СЛОЖНОСТЬ --
 O(N*logN) - средний случай
+
+!!!!!!!!!!!
 O(N^2) - худший случай
 
 Выбор pivot - O(1)
@@ -40,65 +43,62 @@ O(N) - память только для хранения исходного ма
  */
 
 import java.io.BufferedReader
-import java.io.InputStreamReader
 
 fun main() {
-	val reader = BufferedReader(InputStreamReader(System.`in`))
+	val reader = System.`in`.bufferedReader()
 	val internsCount = reader.readInt()
 	val interns = reader.readInterns(internsCount)
-	quickSortInPlace(interns, 0, interns.size - 1)
-	interns.forEach { println(it.login) }
+	interns.quickSortInPlace(0, interns.lastIndex, comparator())
+	print(interns.joinToString(separator = "\n") { it.login })
 }
 
-fun quickSortInPlace(interns: Array<Intern>, start: Int, end: Int) {
-  val middle = start + (end - start) / 2
-	val pivot = interns[middle]
+fun <T> Array<T>.quickSortInPlace(start: Int, end: Int, comparator: Comparator<in T>) {
+	if (isEmpty() || start >= end) return
+
+	val pivot = random()
+//	val pivot = pivot(this, comparator)
 
 	var left = start
 	var right = end
 	while (left < right) {
-		while (comparator(interns[left], pivot)) left++
-		while (!comparator(interns[right], pivot) && interns[right] != pivot) right--
+		while (comparator.compare(get(left), pivot) < 0) left++
+		while (comparator.compare(get(right), pivot) > 0) right--
 
-		if (left <= right) {
-			swap(interns, left, right)
-			left++
-			right--
-		}
+		if (left < right) swap(left, right)
 	}
 
-	if (start < right) quickSortInPlace(interns, start, left)
-	if (end > left) quickSortInPlace(interns, left, end)
+	quickSortInPlace(start, left, comparator)
+	quickSortInPlace(left + 1, end, comparator)
 }
 
-fun swap(interns: Array<Intern>, i: Int, j: Int) {
-	val tmp = interns[i]
-	interns[i] = interns[j]
-	interns[j] = tmp
+private fun <T> pivot(interns: Array<T>, comparator: Comparator<in T>): T {
+	if (interns.isEmpty()) throw RuntimeException("Array is empty")
+	if (interns.size == 2) return interns.random()
+
+	val middle = interns.lastIndex / 2
+	val sorted = mutableListOf(interns.first(), interns[middle], interns.last()).sortedWith(comparator)
+	return sorted[sorted.lastIndex / 2]
 }
 
-private fun comparator(intern: Intern, pivot: Intern): Boolean {
-	return if (intern.taskCount == pivot.taskCount) {
-		if (intern.penaltyCount == pivot.penaltyCount) {
-			intern.login < pivot.login
-		} else {
-			intern.penaltyCount < pivot.penaltyCount
-		}
-	} else {
-		intern.taskCount > pivot.taskCount
-	}
+private fun <T> Array<T>.swap(i: Int, j: Int) {
+	val tmp = this[i]
+	this[i] = this[j]
+	this[j] = tmp
 }
+
+private fun comparator() =
+	compareByDescending<Intern> { it.taskCount }.thenBy { it.penaltyCount }.thenBy { it.login }
 
 private fun BufferedReader.readInt() = readLine().toInt()
 
-private fun BufferedReader.readInterns(n: Int) = (0 until n).map {
+private fun BufferedReader.readInterns(n: Int) = Array(n) {
 	val (login, tasksCount, penaltiesCount) = readLine().split(" ")
 	Intern(
 		login = login,
 		taskCount = tasksCount.toInt(),
-		penaltyCount = penaltiesCount.toInt(),
+		penaltyCount = penaltiesCount.toInt()
 	)
-}.toTypedArray()
+}
 
 data class Intern(
 	val login: String,

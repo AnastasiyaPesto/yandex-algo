@@ -12,9 +12,15 @@ class BKtTest {
 	@ParameterizedTest
 	@MethodSource("internsProvider")
 	fun quickSortInPlace(interns: Array<Intern>, expected: Array<Intern>) {
-		quickSortInPlace(interns, 0, interns.size - 1)
+		val comparator = compareByDescending<Intern> { it.taskCount }
+			.thenBy { it.penaltyCount }
+			.thenBy { it.login }
+//		val comparator = compareBy<Intern> { it.taskCount }
+//			.thenByDescending { it.penaltyCount }
+//			.thenByDescending { it.login }
+		interns.quickSortInPlace(0, interns.lastIndex, comparator)
 
-		assertThat(interns).isEqualTo(expected)
+		assertThat(interns.toList()).containsExactlyElementsOf(expected.toList())
 	}
 
 	companion object {
@@ -36,6 +42,22 @@ class BKtTest {
 					Intern("gosha", 2, 90),
 					Intern("rita", 2, 90),
 				)
+			),
+			arguments(
+				arrayOf(
+					Intern("alla", 0, 0),
+					Intern("gena", 0, 0),
+					Intern("gosha", 0, 0),
+					Intern("rita", 0, 0),
+					Intern("timofey", 0, 0),
+				),
+				arrayOf(
+					Intern("alla", 0, 0),
+					Intern("gena", 0, 0),
+					Intern("gosha", 0, 0),
+					Intern("rita", 0, 0),
+					Intern("timofey", 0, 0),
+				),
 			),
 		)
 	}
