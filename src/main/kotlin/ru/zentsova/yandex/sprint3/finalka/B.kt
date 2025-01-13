@@ -64,7 +64,7 @@ fun <T> Array<T>.quickSortInPlace(start: Int, end: Int, comparator: Comparator<i
 		while (comparator.compare(get(left), pivot) < 0) left++
 		while (comparator.compare(get(right), pivot) > 0) right--
 
-		if (left < right) swap(left, right)
+		if (left <= right) swap(left, right)
 	}
 
 	quickSortInPlace(start, left, comparator)
