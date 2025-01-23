@@ -3,7 +3,8 @@ package ru.zentsova.yandex.sprint3.finalka
 /*
 -- Спринт 3. Финалка. Б. Эффективная быстрая сортировка --
 Ссылка на удачную посылку: https://contest.yandex.ru/contest/23815/run-report/131271817/
-Ссылка на удачную посылку (поле 1-ого ревью):
+Ссылка на удачную посылку (поcле 1-ого ревью):
+https://contest.yandex.ru/contest/23815/run-report/131420626/
 
 -- ПРИНЦИП РАБОТЫ --
 Реализация быстрой сортировки "in-place".
@@ -11,16 +12,12 @@ package ru.zentsova.yandex.sprint3.finalka
 1. Выбираю опорный элемент (в моем случае это элемент в середине массива)
 2. В цикле (первый while) перемещаю элементы, которые "старше" опорного в левую часть, "младше или равные" - в правую.
 2.1. Сначала двигаю индексы до нужных позиций (left и right). Элементы на этих местах нужно обменять местами (swap).
-2.2. Обмениваю и сразу двигаю индекс left право, а индекс right влево, так как нет необходимости проверять только что обменянные элементы.
+2.2. Обмениваю элементы местами
 2.3. Продолжаю пока индексы left и right не пересекутся
 3. Для каждой части массива вызываю метод рекурсивно.
 
 Базовый случай:
-Если левая граница массива (с которым работаем на текущем уровне рекурсии) больше или равна идексу right,
-то левую часть массива сортировать больше не нужно.
-
-Если правая граница массива (с которым работаем на текущем уровне рекурсии) меньше или равна идексу left,
-то правую часть массива сортировать больше не нужно.
+Если начало дальше конца (или равно)
 
 -- ДОКАЗАТЕЛЬСТВО КОРРЕКТНОСТИ --
 Алгоритм не требует дополнительной памяти для хранения массива с элементами больше опорного,
@@ -29,9 +26,6 @@ package ru.zentsova.yandex.sprint3.finalka
 
 -- ВРЕМЕННАЯ СЛОЖНОСТЬ --
 O(N*logN) - средний случай
-
-!!!!!!!!!!!
-O(N^2) - худший случай
 
 Выбор pivot - O(1)
 Глубина рекурсии - O(logN)
@@ -55,8 +49,7 @@ fun main() {
 fun <T> Array<T>.quickSortInPlace(start: Int, end: Int, comparator: Comparator<in T>) {
 	if (isEmpty() || start >= end) return
 
-	val pivot = random()
-//	val pivot = pivot(this, comparator)
+	val pivot = get((start..end).random())
 
 	var left = start
 	var right = end
@@ -69,15 +62,6 @@ fun <T> Array<T>.quickSortInPlace(start: Int, end: Int, comparator: Comparator<i
 
 	quickSortInPlace(start, left, comparator)
 	quickSortInPlace(left + 1, end, comparator)
-}
-
-private fun <T> pivot(interns: Array<T>, comparator: Comparator<in T>): T {
-	if (interns.isEmpty()) throw RuntimeException("Array is empty")
-	if (interns.size == 2) return interns.random()
-
-	val middle = interns.lastIndex / 2
-	val sorted = mutableListOf(interns.first(), interns[middle], interns.last()).sortedWith(comparator)
-	return sorted[sorted.lastIndex / 2]
 }
 
 private fun <T> Array<T>.swap(i: Int, j: Int) {
