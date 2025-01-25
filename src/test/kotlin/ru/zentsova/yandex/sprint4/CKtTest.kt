@@ -22,11 +22,11 @@ class CKtTest {
 			return Stream.of(
 				arguments("mxyskaoghi", "qodfrgmslc", true),
 				arguments("agg", "xdd", true),
+				arguments("agg", "xda", false),
 				arguments("aaaaaaa", "bbbbbbb", true),
 				arguments("aa", "b", false),
 				arguments("a", "bb", false),
 				arguments("aaaaaaa", "bbbbbb", false),
-				arguments("agg", "xda", false),
 				arguments("z", "y", true),
 				arguments("abcdee", "abcder", false),
 				arguments("aba", "xxx", false),
