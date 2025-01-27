@@ -14,19 +14,20 @@ fun main() {
 fun compare(str1: String, str2: String): Boolean {
 	if (str1.length != str2.length) return false
 
-	val letterPairs1 = mutableMapOf<Char, Char>()
-	val letterPairs2 = mutableMapOf<Char, Char>()
+	val letterPairs12 = mutableMapOf<Char, Char>()
+	val letterPairs21 = mutableMapOf<Char, Char>()
 	for (i in str1.indices) {
 		val l1 = str1[i]
 		val l2 = str2[i]
 
-		if (!letterPairs1.containsKey(l1) && !letterPairs2.containsKey(l2)) {
-			letterPairs1[l1] = l2
-			letterPairs2[l2] = l1
+		if (!letterPairs12.containsKey(l1) && !letterPairs21.containsKey(l2)) {
+			letterPairs12[l1] = l2
+			letterPairs21[l2] = l1
+			continue
 		}
 
-		if ((letterPairs1.containsKey(l1) && letterPairs1.getValue(l1) != l2)
-			   || (letterPairs2.containsKey(l2) && letterPairs2.getValue(l2) != l1))
+		if ((letterPairs12.containsKey(l1) && letterPairs12.getValue(l1) != l2)
+			   || (letterPairs21.containsKey(l2) && letterPairs21.getValue(l2) != l1))
 		{
 			return false
 		}

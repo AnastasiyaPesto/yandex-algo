@@ -21,6 +21,9 @@ class CKtTest {
 		fun stringsProvider(): Stream<Arguments> {
 			return Stream.of(
 				arguments("mxyskaoghi", "qodfrgmslc", true),
+				arguments("mosqa", "qmfsg", true),
+				arguments("mom", "qma", false),
+				arguments("moa", "qmq", false),
 				arguments("agg", "xdd", true),
 				arguments("agg", "xda", false),
 				arguments("aaaaaaa", "bbbbbbb", true),
