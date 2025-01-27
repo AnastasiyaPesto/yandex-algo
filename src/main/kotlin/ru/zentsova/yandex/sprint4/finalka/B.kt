@@ -94,8 +94,8 @@ fun main() {
 		val (operation, key, value) = reader.command()
 		when (operation) {
 			Operation.PUT -> hashTable.put(key, value!!)
-			Operation.GET -> hashTable.get(key)?.let { println(it) } ?: println("None")
-			Operation.DELETE -> hashTable.delete(key)?.let { println(it) } ?: println("None")
+			Operation.GET -> println(hashTable.get(key) ?: "None")
+			Operation.DELETE -> println(hashTable.delete(key) ?: "None")
 		}
 	}
 }
