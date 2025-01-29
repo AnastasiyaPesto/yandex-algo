@@ -1,90 +1,22 @@
 package ru.zentsova.yandex.sprint4.finalka
 
+/*
+-- Спринт 4. Финалка. B. Хеш-таблица --
+Ссылка на удачную посылку: https://contest.yandex.ru/contest/24414/run-report/132440959/
+
+
+-- ПРИНЦИП РАБОТЫ --
+
+-- ДОКАЗАТЕЛЬСТВО КОРРЕКТНОСТИ --
+
+-- ВРЕМЕННАЯ СЛОЖНОСТЬ --
+
+-- ПРОСТРАНСТВЕННАЯ СЛОЖНОСТЬ --
+ */
+
 import java.io.BufferedReader
+import java.lang.Math.floorMod
 import java.util.*
-import kotlin.math.abs
-
-class HashTable(private val size: Int = 99991) {
-	private val table = Array<MutableList<Pair1>?>(size) { null }
-
-	fun put(key: Int, value: Int) {
-		val hashCode = hashCode(key)
-		val idx = mod(hashCode, size)
-		val list = table[idx]
-
-		var shouldAdd = true
-		if (list != null) {
-			for (i in list.indices) {
-				if (list[i].key == key) {
-					list[i].value = value
-					shouldAdd = false
-					break
-				}
-			}
-			if (shouldAdd) table[idx]!!.add(Pair1(key, value))
-		} else {
-			table[idx] = mutableListOf(Pair1(key, value))
-		}
-	}
-
-	fun get(key: Int): Int? {
-		val hashCode = hashCode(key)
-		val idx = mod(hashCode, size)
-		val list = table[idx]
-
-		return if (list != null) {
-			var value: Int? = null
-			for (i in list.indices) {
-				if (list[i].key == key) {
-					value = list[i].value
-					break
-				}
-			}
-			value
-		} else null
-	}
-
-	fun delete(key: Int): Int? {
-		val hashCode = hashCode(key)
-		val idx = mod(hashCode, size)
-		val list = table[idx]
-
-		return if (list != null) {
-			var idxToDelete = -1
-			for (i in list.indices) {
-				if (list[i].key == key) {
-					idxToDelete = i
-					break
-				}
-			}
-
-			val valueToReturn = if (idxToDelete != -1) {
-				val value = list[idxToDelete].value
-				list.removeAt(idxToDelete)
-				value
-			} else null
-
-			valueToReturn
-		} else null
-	}
-
-	private fun hashCode(k: Int): Int {
-		return k
-	}
-
-	private fun mod(x: Int, y: Int): Int {
-		val j = when {
-			x < 0 -> -1 * (abs(x) / y + 1)
-			else -> x / y
-		}
-		return x - j
-	}
-
-	private data class Pair1(
-		val key: Int,
-		var value: Int,
-	)
-}
 
 fun main() {
 	val reader = System.`in`.bufferedReader()
@@ -117,6 +49,89 @@ private fun String.toOperation(): Operation = when (this) {
 	"get" -> Operation.GET
 	"delete" -> Operation.DELETE
 	else -> throw IllegalArgumentException("Unknown operation")
+}
+
+class HashTable {
+	private val size: Int = 100003
+	private val table = Array<MutableList<KeyValue>?>(size) { null }
+
+	fun put(key: Int, value: Int) {
+		val idx = bucketIndex(key)
+		val list = table[idx]
+
+		var shouldAdd = true
+		if (list != null) {
+			for (i in list.indices) {
+				if (list[i].key == key) {
+					shouldAdd = false
+					break
+				}
+			}
+			if (shouldAdd) table[idx]!!.add(KeyValue(key, value))
+		} else {
+			table[idx] = mutableListOf(KeyValue(key, value))
+		}
+	}
+
+	fun get(key: Int): Int? {
+		val idx = bucketIndex(key)
+		val list = table[idx]
+
+		return if (list != null) {
+			for (i in list.indices) {
+				if (list[i].key == key) {
+					return list[i].value
+				}
+			}
+			null
+		} else null
+	}
+
+	fun delete(key: Int): Int? {
+		val idx = bucketIndex(key)
+		val list = table[idx]
+
+		return if (list != null) {
+			var idxToDelete = -1
+			for (i in list.indices) {
+				if (list[i].key == key) {
+					idxToDelete = i
+					break
+				}
+			}
+
+			val valueToReturn = if (idxToDelete != -1) {
+				val value = list[idxToDelete].value
+				list.removeAt(idxToDelete)
+				value
+			} else null
+
+			valueToReturn
+		} else null
+	}
+
+	private fun hashCode(k: Int): Int {
+		val prime = 31
+		var result = k
+
+		result = result xor (result ushr 16)
+		result *= prime
+		result = result xor (result ushr 13)
+		result *= prime
+		result = result xor (result ushr 14)
+
+		return result
+	}
+
+	private fun bucketIndex(key: Int): Int {
+		val hash = hashCode(key)
+		return floorMod(hash, size)
+	}
+
+	private data class KeyValue(
+		val key: Int,
+		var value: Int,
+	)
 }
 
 enum class Operation {
