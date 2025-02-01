@@ -12,6 +12,7 @@ build/
 *.iws
 *.iml
 *.ipr
+misc.xml
 vcs.xml
 out/
 !**/src/main/**/out/
