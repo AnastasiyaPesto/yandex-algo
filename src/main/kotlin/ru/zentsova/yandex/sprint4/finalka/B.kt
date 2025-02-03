@@ -43,8 +43,7 @@ package ru.zentsova.yandex.sprint4.finalka
 -- ПРОСТРАНСТВЕННАЯ СЛОЖНОСТЬ --
 
 В худшем случае O(N), где N - размер массива в котором хранятся элементы.
-
- */
+*/
 
 import java.io.BufferedReader
 import java.lang.Math.floorMod

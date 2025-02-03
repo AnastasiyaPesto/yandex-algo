@@ -1,5 +1,21 @@
 package ru.zentsova.yandex.sprint4.finalka
 
+/*
+-- Спринт 4. Финалка. B. Поисковая система --
+Ссылка на удачную посылку: https://contest.yandex.ru/contest/24414/run-report/132727312/
+
+
+-- ПРИНЦИП РАБОТЫ --
+
+
+-- ДОКАЗАТЕЛЬСТВО КОРРЕКТНОСТИ --
+
+
+-- ВРЕМЕННАЯ СЛОЖНОСТЬ --
+
+
+*/
+
 import java.io.BufferedReader
 
 fun main() {
@@ -14,19 +30,17 @@ fun main() {
 		)
 	}
 
-	val inputQueries = (1..reader.readInt()).map { reader.readLine() }
-	val queryDocumentRelevance = documentRelevance(queries = inputQueries, searchIndex = searchIndex)
-
-  searchIndex.clear()
-
 	val outputBuffer = StringBuilder()
-	for (query in queryDocumentRelevance) {
-		query.sort()
+	repeat(reader.readInt()) {
+		val query = reader.readLine()
+		val documentsRelevance = documentRelevance(query = query, searchIndex = searchIndex)
+		documentsRelevance.sort()
 			.let { if (it.size < 5) it else it.subList(0, 5) }
 			.forEach { outputBuffer.append(it.serialNumber).append(" ") }
 
 		outputBuffer.append("\n")
 	}
+
 	println(outputBuffer)
 }
 
@@ -37,24 +51,19 @@ fun searchIndex(document: String, docSerialNum: Int, searchIndex: MutableMap<Str
 	}
 }
 
-fun documentRelevance(queries: List<String>, searchIndex: Map<String, Map<Int, Int>>): List<List<DocumentData>> {
-	if (searchIndex.isEmpty() || queries.isEmpty()) return emptyList()
+fun documentRelevance(query: String, searchIndex: Map<String, Map<Int, Int>>): List<DocumentData> {
+	if (searchIndex.isEmpty() || query.isBlank()) return emptyList()
 
-	val result = mutableListOf<List<DocumentData>>()
-	queries.forEach { query ->
-		val queryDocumentData = mutableMapOf<Int, Int>()
-		query.split(" ").toSet().forEach { word ->
-			if (searchIndex.containsKey(word)) {
-				searchIndex.getValue(word).forEach { (serialDocNum, count) ->
-					queryDocumentData.compute(serialDocNum) { _, curCount -> curCount?.let { it + count } ?: count }
-				}
+	val queryDocumentData = mutableMapOf<Int, Int>()
+	query.split(" ").toSet().forEach { word ->
+		if (searchIndex.containsKey(word)) {
+			searchIndex.getValue(word).forEach { (serialDocNum, count) ->
+				queryDocumentData.compute(serialDocNum) { _, curCount -> curCount?.let { it + count } ?: count }
 			}
 		}
-		val documentDataList = queryDocumentData.map { DocumentData(it.key, it.value) }
-		result.add(documentDataList)
 	}
 
-	return result
+	return queryDocumentData.map { DocumentData(it.key, it.value) }
 }
 
 private fun BufferedReader.readInt() = readLine().toInt()
