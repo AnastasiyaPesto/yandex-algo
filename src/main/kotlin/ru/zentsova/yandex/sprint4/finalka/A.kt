@@ -82,7 +82,7 @@ class SearchIndex {
 		val words = document.split(" ")
 		val countByWord = words.groupingBy { it }.eachCount()
 
-		words.forEach { word ->
+		words.toSet().forEach { word ->
 			searchIndex.compute(word) { _, documentData ->
 				(documentData ?: mutableListOf()).apply {
 					add(
