@@ -44,58 +44,80 @@ import java.io.BufferedReader
 fun main() {
 	val reader = System.`in`.bufferedReader()
 
-	val searchIndex = mutableMapOf<String, MutableMap<Int, Int>>()
+	val searchIndex = SearchIndex()
+
 	repeat(reader.readInt()) { idx ->
-		searchIndex(
+		searchIndex.addDocument(
 			document = reader.readLine(),
 			docSerialNum = idx + 1,
-			searchIndex = searchIndex
 		)
 	}
 
-	val outputBuffer = StringBuilder()
-	repeat(reader.readInt()) {
-		val query = reader.readLine()
-		val documentsRelevance = documentRelevance(query = query, searchIndex = searchIndex)
-		documentsRelevance.sort()
-			.let { if (it.size < 5) it else it.subList(0, 5) }
-			.forEach { outputBuffer.append(it.serialNumber).append(" ") }
+  val topDocumentsCount = 5
+	val outputBuffer = buildString {
+		repeat(reader.readInt()) {
+			val documentsRelevance = searchIndex.documentsRelevance(query = reader.readLine())
+			documentsRelevance
+				.sort()
+				.take(topDocumentsCount)
+				.forEach { append(it.serialNumber).append(" ") }
 
-		outputBuffer.append("\n")
+			append("\n")
+		}
 	}
 
 	println(outputBuffer)
 }
 
-fun searchIndex(document: String, docSerialNum: Int, searchIndex: MutableMap<String, MutableMap<Int, Int>>) {
-	document.split(" ").forEach { word ->
-		val wordsData = searchIndex.getOrPut(word) { mutableMapOf() }
-		wordsData[docSerialNum] = wordsData.getOrDefault(docSerialNum, 0) + 1
-	}
-}
+private fun BufferedReader.readInt() = readLine().toInt()
 
-fun documentRelevance(query: String, searchIndex: Map<String, Map<Int, Int>>): List<DocumentData> {
-	if (searchIndex.isEmpty() || query.isBlank()) return emptyList()
+private fun List<DocumentRelevanceData>.sort() = sortedWith(
+	compareByDescending<DocumentRelevanceData> { it.relevance }.thenBy { it.serialNumber }
+)
 
-	val queryDocumentData = mutableMapOf<Int, Int>()
-	query.split(" ").toSet().forEach { word ->
-		if (searchIndex.containsKey(word)) {
-			searchIndex.getValue(word).forEach { (serialDocNum, count) ->
-				queryDocumentData.compute(serialDocNum) { _, curCount -> curCount?.let { it + count } ?: count }
+class SearchIndex {
+	private val searchIndex: MutableMap<String, MutableList<DocumentData>> = mutableMapOf()
+
+	fun addDocument(document: String, docSerialNum: Int) {
+		val words = document.split(" ")
+		val countByWord = words.groupingBy { it }.eachCount()
+
+		words.forEach { word ->
+			searchIndex.compute(word) { _, documentData ->
+				(documentData ?: mutableListOf()).apply {
+					add(
+						DocumentData(
+							serialNumber = docSerialNum,
+							wordQuantity = countByWord.getValue(word)
+						)
+					)
+				}
 			}
 		}
 	}
 
-	return queryDocumentData.map { DocumentData(it.key, it.value) }
+	fun documentsRelevance(query: String): List<DocumentRelevanceData> {
+		if (query.isBlank()) return emptyList()
+
+		return query.split(" ").toSet()
+			.flatMap { word -> searchIndex[word].orEmpty() }
+			.groupBy({ it.serialNumber }, { it.wordQuantity })
+			.map { (serialNumber, counts) ->
+				DocumentRelevanceData(serialNumber = serialNumber, relevance = counts.sum())
+			}
+	}
 }
 
-private fun BufferedReader.readInt() = readLine().toInt()
+interface Document {
+	val serialNumber: Int
+}
 
-private fun List<DocumentData>.sort() = sortedWith(
-	compareByDescending<DocumentData> { it.relevanceValue }.thenBy { it.serialNumber }
-)
+data class DocumentRelevanceData(
+	val relevance: Int,
+	override val serialNumber: Int
+) : Document
 
 data class DocumentData(
-	val serialNumber: Int,
-	val relevanceValue: Int,
-)
+	val wordQuantity: Int,
+	override val serialNumber: Int
+) : Document

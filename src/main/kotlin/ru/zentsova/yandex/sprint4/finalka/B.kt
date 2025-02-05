@@ -51,7 +51,7 @@ import java.util.*
 
 fun main() {
 	val reader = System.`in`.bufferedReader()
-  val operationsCount = reader.readInt()
+	val operationsCount = reader.readInt()
 	val hashTable = HashTable()
 	for (i in 0 until operationsCount) {
 		val (operation, key, value) = reader.command()
