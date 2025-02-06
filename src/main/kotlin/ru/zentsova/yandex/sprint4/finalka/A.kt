@@ -53,13 +53,12 @@ fun main() {
 		)
 	}
 
-  val topDocumentsCount = 5
+	val topDocumentsCount = 5
+	val comparator = 	compareByDescending<DocumentRelevanceData> { it.relevance }.thenBy { it.serialNumber }
 	val outputBuffer = buildString {
 		repeat(reader.readInt()) {
-			val documentsRelevance = searchIndex.documentsRelevance(query = reader.readLine())
-			documentsRelevance
-				.sort()
-				.take(topDocumentsCount)
+			searchIndex
+				.documentsRelevance(reader.readLine(), topDocumentsCount, comparator)
 				.forEach { append(it.serialNumber).append(" ") }
 
 			append("\n")
@@ -70,10 +69,6 @@ fun main() {
 }
 
 private fun BufferedReader.readInt() = readLine().toInt()
-
-private fun List<DocumentRelevanceData>.sort() = sortedWith(
-	compareByDescending<DocumentRelevanceData> { it.relevance }.thenBy { it.serialNumber }
-)
 
 class SearchIndex {
 	private val searchIndex: MutableMap<String, MutableList<DocumentData>> = mutableMapOf()
@@ -96,15 +91,28 @@ class SearchIndex {
 		}
 	}
 
-	fun documentsRelevance(query: String): List<DocumentRelevanceData> {
+	fun documentsRelevance(query: String, countToReturn: Int, comparator: Comparator<DocumentRelevanceData>, ): List<DocumentRelevanceData> {
 		if (query.isBlank()) return emptyList()
 
-		return query.split(" ").toSet()
+		val result = mutableListOf<DocumentRelevanceData>()
+		query.split(" ").toSet()
 			.flatMap { word -> searchIndex[word].orEmpty() }
 			.groupBy({ it.serialNumber }, { it.wordQuantity })
-			.map { (serialNumber, counts) ->
-				DocumentRelevanceData(serialNumber = serialNumber, relevance = counts.sum())
+			.forEach { (serialNumber, counts) ->
+				val document = DocumentRelevanceData(serialNumber = serialNumber, relevance = counts.sum())
+				if (result.size < countToReturn) {
+					result.add(document)
+					result.sortWith(comparator)
+				} else if (document.relevance == result.last().relevance) {
+					result[result.lastIndex] = document
+					result.sortWith(comparator)
+				} else if (document.relevance == result.last().relevance && document.serialNumber < result.last().serialNumber) {
+					result[result.lastIndex] = document
+					result.sortWith(comparator)
+				}
 			}
+
+		return result
 	}
 }
 
