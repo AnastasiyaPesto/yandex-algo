@@ -2,7 +2,8 @@ package ru.zentsova.yandex.sprint4.finalka
 
 /*
 -- Спринт 4. Финалка. B. Поисковая система --
-Ссылка на удачную посылку: https://contest.yandex.ru/contest/24414/run-report/132727312/
+Ссылка на удачную посылку: https://contest.yandex.ru/contest/24414/run-report/132727312/,
+  после 1-го ревью: https://contest.yandex.ru/contest/24414/run-report/132957813/
 
 -- ПРИНЦИП РАБОТЫ --
 
@@ -11,11 +12,17 @@ package ru.zentsova.yandex.sprint4.finalka
 - DocumentData.serialNumber - порядковый номер документа
 - DocumentData.wordQuantity - сколько раз встречается слово (key) в предложении
 
+Как вычисляется value:
+Каждый документ заранее известен, поэтому с помощью группировки подсчитываю кол-во повторений каждого слова в документе,
+и кладу это значение в поисковый индекс
 
-// todo
-
-Для каждого запрос in-place вычисляется релевантность всех документов,
-полученный массив сортируется и выводится рейтинг из первых 5-ти документов.
+Как вычисляется релевантность для каждого запроса:
+1. Для каждого уникального слова из поискового индекса получаю листы - в каких документах и сколько раз встречается слово
+2. С помощью flatMap преобразую в список
+3. В цикле заполняю вспомогательный массив до 5 элементов и сортирую
+Если элементов больше, чем 5, то сравниваю текущее значение с последним значением из вспомогательного массива.
+Если текущий элемент больше, чем последний, то перезаписываю последний элемент и произвожу сортировку.
+Так как массив всего из 5 элементов (константа), то сортировка происходит за линию + для хранения понадобится O(1)
 
 -- ДОКАЗАТЕЛЬСТВО КОРРЕКТНОСТИ --
 
@@ -30,15 +37,14 @@ O(K) - из набора слов исходного запроса постро
        где K - количество слов в исходном запросе.
 O(K) - вычисление для одного запроса релевантность по каждому документ,
        где K - количество слов в запросе.
-O(NLogN) - сортировка документов для одного запроса.
+O(1) - сортировка документов для одного запроса (сортировка 5 элементов)
 
 Итоговая:
-O(ND) + O(MK) + O(MK) + O(MNLogN) = O(ND) + O(MK) + O(MNLogN)
+O(ND) + O(MK) + O(MK) + O(MNLogN) = O(ND) + O(MK)
 
 -- ПРОСТРАНСТВЕННАЯ СЛОЖНОСТЬ --
 
 O(M) - хранение поискового индекса, где M - количество слов во всех документах.
-O(1) - хранение словаря (значение в мапе поискового индекса)
 
 Итоговая: O(M)
 */
@@ -107,9 +113,7 @@ class SearchIndex {
 				if (result.size < countToReturn) {
 					result.add(document)
 					result.sortWith(comparator)
-				} else if (document.relevance > result.last().relevance ||
-					         document.relevance == result.last().relevance && document.serialNumber < result.last().serialNumber)
-				{
+				} else if (compare(document, result.last())) {
 					result[result.lastIndex] = document
 					result.sortWith(comparator)
 				}
@@ -117,6 +121,9 @@ class SearchIndex {
 
 		return result
 	}
+
+	private fun compare(o1: DocumentRelevanceData, o2: DocumentRelevanceData): Boolean =
+		o1.relevance > o2.relevance || o1.relevance == o2.relevance && o1.serialNumber < o2.serialNumber
 }
 
 interface Document {
