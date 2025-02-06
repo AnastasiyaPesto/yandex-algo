@@ -64,7 +64,7 @@ fun main() {
 	}
 
 	val topDocumentsCount = 5
-	val comparator = 	compareByDescending<DocumentRelevanceData> { it.relevance }.thenBy { it.serialNumber }
+	val comparator = compareByDescending<DocumentRelevanceData> { it.relevance }.thenBy { it.serialNumber }
 	val outputBuffer = buildString {
 		repeat(reader.readInt()) {
 			searchIndex
