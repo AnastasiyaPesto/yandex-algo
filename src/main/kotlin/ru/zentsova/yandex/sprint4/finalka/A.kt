@@ -103,10 +103,9 @@ class SearchIndex {
 				if (result.size < countToReturn) {
 					result.add(document)
 					result.sortWith(comparator)
-				} else if (document.relevance > result.last().relevance) {
-					result[result.lastIndex] = document
-					result.sortWith(comparator)
-				} else if (document.relevance == result.last().relevance && document.serialNumber < result.last().serialNumber) {
+				} else if (document.relevance > result.last().relevance ||
+					         document.relevance == result.last().relevance && document.serialNumber < result.last().serialNumber)
+				{
 					result[result.lastIndex] = document
 					result.sortWith(comparator)
 				}
