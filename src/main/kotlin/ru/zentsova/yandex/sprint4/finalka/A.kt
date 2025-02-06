@@ -3,7 +3,7 @@ package ru.zentsova.yandex.sprint4.finalka
 /*
 -- Спринт 4. Финалка. B. Поисковая система --
 Ссылка на удачную посылку: https://contest.yandex.ru/contest/24414/run-report/132727312/,
-  после 1-го ревью: https://contest.yandex.ru/contest/24414/run-report/132957813/
+  после 1-го ревью: https://contest.yandex.ru/contest/24414/run-report/132958336/
 
 -- ПРИНЦИП РАБОТЫ --
 
