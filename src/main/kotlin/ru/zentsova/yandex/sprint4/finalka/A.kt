@@ -101,7 +101,7 @@ class SearchIndex {
 		}
 	}
 
-	fun documentsRelevance(query: String, countToReturn: Int, comparator: Comparator<DocumentRelevanceData>, ): List<DocumentRelevanceData> {
+	fun documentsRelevance(query: String, countToReturn: Int, comparator: Comparator<DocumentRelevanceData>): List<DocumentRelevanceData> {
 		if (query.isBlank()) return emptyList()
 
 		val result = mutableListOf<DocumentRelevanceData>()
@@ -113,7 +113,7 @@ class SearchIndex {
 				if (result.size < countToReturn) {
 					result.add(document)
 					result.sortWith(comparator)
-				} else if (compare(document, result.last())) {
+				} else if (comparator.compare(document, result.last()) < 0) {
 					result[result.lastIndex] = document
 					result.sortWith(comparator)
 				}
@@ -121,9 +121,6 @@ class SearchIndex {
 
 		return result
 	}
-
-	private fun compare(o1: DocumentRelevanceData, o2: DocumentRelevanceData): Boolean =
-		o1.relevance > o2.relevance || o1.relevance == o2.relevance && o1.serialNumber < o2.serialNumber
 }
 
 interface Document {
