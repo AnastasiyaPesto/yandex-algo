@@ -15,10 +15,19 @@ fun polynomialHash(string: String, a: Int, m: Int): Int {
 	for (i in 1..string.lastIndex) {
 		hash = (hash * a + string[i].code) % m
 	}
+
 	return hash.toInt()
 }
 
 val Char.letterCodeLong: Long get() = this.code.toLong()
+
+//fun polyHash(str: String, a: Int, m: Int): Int {
+//	var hash = 0
+//	for (ch in str) {
+//		hash = (hash * a % m + ch.code) % m
+//	}
+//	return hash
+//}
 
 private fun readInt() = readStr().toInt()
 private fun readStr() = readln()
