@@ -3,7 +3,8 @@ package ru.zentsova.yandex.sprint4.finalka
 /*
 -- Спринт 4. Финалка. B. Хеш-таблица --
 Ссылка на удачную посылку: https://contest.yandex.ru/contest/24414/run-report/132440959/,
-  после 1-го ревью: https://contest.yandex.ru/contest/24414/run-report/132963835/
+  после 1-го ревью: https://contest.yandex.ru/contest/24414/run-report/132963835/,
+  после 2-го ревью: https://contest.yandex.ru/contest/24414/run-report/133033851/
 
 -- ПРИНЦИП РАБОТЫ --
 Так как в условии сказано, что поддерживать рехеширование и масштабирование хеш-таблицы не требуется,
@@ -58,8 +59,8 @@ fun main() {
 			val (operation, key, value) = reader.command()
 			when (operation) {
 				Operation.PUT -> hashTable.put(key, value!!)
-				Operation.GET -> append(hashTable.get(key) ?: "None").append("\n")
-				Operation.DELETE -> append(hashTable.delete(key) ?: "None").append("\n")
+				Operation.GET -> appendLine(hashTable.get(key) ?: "None")
+				Operation.DELETE -> appendLine(hashTable.delete(key) ?: "None")
 			}
 		}
 	}

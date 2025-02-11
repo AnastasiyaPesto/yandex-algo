@@ -14,7 +14,7 @@ fun main() {
 	val result = buildList {
 		repeat(reader.readInt()) {
 			val (start, end) = reader.readRange()
-			add(hash(prefixHashes, powers, start, end, mod))
+			add(hash(prefixHashes, powers, start - 1, end - 1, mod))
 		}
 	}
 	print(result.joinToString(separator = "\n"))
@@ -30,8 +30,9 @@ private fun BufferedReader.readRange(): Pair<Int, Int> {
 
 fun prefixHashes(str: String, a: Int, mod: Int): LongArray {
 	val prefixHashes = LongArray(str.length + 1) { 0 }
-	for (i in str.indices) {
-		prefixHashes[i + 1] = (prefixHashes[i] * a % mod + str[i].code) % mod
+	for (i in 1..str.lastIndex) {
+//		prefixHashes[i + 1] = (prefixHashes[i] * a % mod + str[i].code) % mod
+		prefixHashes[i] = (prefixHashes[i - 1] * a + str[i - 1].code) % mod
 	}
 	return prefixHashes
 }
@@ -45,5 +46,5 @@ fun powers(str: String, a: Int, mod: Int): LongArray {
 }
 
 fun hash(prefixHashes: LongArray, powers: LongArray, start: Int, end: Int, mod: Int): Long {
- return (prefixHashes[end] + mod - (prefixHashes[start] + powers[end - start]) % mod) % mod
+ return (prefixHashes[end] + mod - (prefixHashes[start - 1] + powers[end - start - 1]) % mod) % mod
 }

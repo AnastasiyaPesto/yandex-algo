@@ -3,7 +3,8 @@ package ru.zentsova.yandex.sprint4.finalka
 /*
 -- Спринт 4. Финалка. B. Поисковая система --
 Ссылка на удачную посылку: https://contest.yandex.ru/contest/24414/run-report/132727312/,
-  после 1-го ревью: https://contest.yandex.ru/contest/24414/run-report/132958336/
+  после 1-го ревью: https://contest.yandex.ru/contest/24414/run-report/132958336/,
+  после 2-го ревью: https://contest.yandex.ru/contest/24414/run-report/133035423/
 
 -- ПРИНЦИП РАБОТЫ --
 
@@ -56,22 +57,22 @@ fun main() {
 
 	val searchIndex = SearchIndex()
 
-	repeat(reader.readInt()) { idx ->
+	for (idx in 1..reader.readInt()) {
 		searchIndex.addDocument(
 			document = reader.readLine(),
-			docSerialNum = idx + 1,
+			docSerialNum = idx,
 		)
 	}
 
 	val topDocumentsCount = 5
-	val comparator = compareByDescending<DocumentRelevanceData> { it.relevance }.thenBy { it.serialNumber }
+	val comparator = compareByDescending<DocumentRelevanceData> { it.wordsQuantity }.thenBy { it.serialNumber }
 	val outputBuffer = buildString {
 		repeat(reader.readInt()) {
-			searchIndex
+			val topDocuments = searchIndex
 				.documentsRelevance(reader.readLine(), topDocumentsCount, comparator)
-				.forEach { append(it.serialNumber).append(" ") }
+				.map { it.serialNumber }
 
-			append("\n")
+			appendLine(topDocuments.joinToString(separator = " "))
 		}
 	}
 
@@ -81,41 +82,38 @@ fun main() {
 private fun BufferedReader.readInt() = readLine().toInt()
 
 class SearchIndex {
-	private val searchIndex: MutableMap<String, MutableList<DocumentData>> = mutableMapOf()
+	private val searchIndex: MutableMap<String, MutableList<DocumentRelevanceData>> = mutableMapOf()
 
-	fun addDocument(document: String, docSerialNum: Int) {
-		val words = document.split(" ")
-		val countByWord = words.groupingBy { it }.eachCount()
-
-		words.toSet().forEach { word ->
-			searchIndex.compute(word) { _, documentData ->
-				(documentData ?: mutableListOf()).apply {
-					add(
-						DocumentData(
-							serialNumber = docSerialNum,
-							wordQuantity = countByWord.getValue(word)
-						)
-					)
-				}
-			}
+	fun addDocument(document: String, docSerialNum: Int) = document
+		.split(" ")
+		.groupingBy { it }
+		.eachCount()
+		.forEach { (word, count) ->
+			searchIndex
+				.getOrPut(word) { mutableListOf() }
+				.add(DocumentRelevanceData(serialNumber = docSerialNum, wordsQuantity = count))
 		}
-	}
 
 	fun documentsRelevance(query: String, countToReturn: Int, comparator: Comparator<DocumentRelevanceData>): List<DocumentRelevanceData> {
 		if (query.isBlank()) return emptyList()
 
 		val result = mutableListOf<DocumentRelevanceData>()
-		query.split(" ").toSet()
+		query
+			.split(" ")
+			.toSet()
 			.flatMap { word -> searchIndex[word].orEmpty() }
-			.groupBy({ it.serialNumber }, { it.wordQuantity })
+			.groupBy({ it.serialNumber }, { it.wordsQuantity })
 			.forEach { (serialNumber, counts) ->
-				val document = DocumentRelevanceData(serialNumber = serialNumber, relevance = counts.sum())
-				if (result.size < countToReturn) {
-					result.add(document)
-					result.sortWith(comparator)
-				} else if (comparator.compare(document, result.last()) < 0) {
-					result[result.lastIndex] = document
-					result.sortWith(comparator)
+				val document = DocumentRelevanceData(serialNumber = serialNumber, wordsQuantity = counts.sum())
+				when {
+					result.size < countToReturn -> {
+						result.add(document)
+						result.sortWith(comparator)
+					}
+					comparator.compare(document, result.last()) < 0 -> {
+						result[result.lastIndex] = document
+						result.sortWith(comparator)
+					}
 				}
 			}
 
@@ -123,16 +121,7 @@ class SearchIndex {
 	}
 }
 
-interface Document {
-	val serialNumber: Int
-}
-
 data class DocumentRelevanceData(
-	val relevance: Int,
-	override val serialNumber: Int
-) : Document
-
-data class DocumentData(
-	val wordQuantity: Int,
-	override val serialNumber: Int
-) : Document
+	val wordsQuantity: Int,
+	val serialNumber: Int
+)
