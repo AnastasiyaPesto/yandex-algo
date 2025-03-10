@@ -13,9 +13,9 @@ class EKtTest {
 		val node4 = Node(8, null, null)
 		val node5 = Node(5, node3, node4)
 
-		assertThat(treeSolution(node5)).isTrue()
+		assertThat(treeSolution(node5)).isEqualTo(true)
 
 		node2.value = 5
-		assertThat(treeSolution(node5)).isFalse()
+		assertThat(treeSolution(node5)).isEqualTo(false)
 	}
 }

@@ -1,5 +1,7 @@
 package ru.zentsova.yandex.sprint5
 
+// I. Разные деревья поиска
+
 fun main() {
 	val n = readln().toInt()
 	val bstCount = countBinarySearchTrees(n)
