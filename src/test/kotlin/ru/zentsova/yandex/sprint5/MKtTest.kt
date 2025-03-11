@@ -13,9 +13,15 @@ class MKtTest {
 	@ParameterizedTest
 	@MethodSource("maxHeapProvider")
 	fun siftUpTest(heap: IntArray, idx: Int, newIndexExpected: Int) {
-//		assertThat(siftUp(heap, idx)).isEqualTo(newIndexExpected)
+		assertThat(siftUp(heap, idx)).isEqualTo(newIndexExpected)
+	}
+
+	@ParameterizedTest
+	@MethodSource("maxHeapProvider")
+	fun siftUpLoopTest(heap: IntArray, idx: Int, newIndexExpected: Int) {
 		assertThat(siftUpLoop(heap, idx)).isEqualTo(newIndexExpected)
 	}
+
 
 	companion object {
 		@JvmStatic

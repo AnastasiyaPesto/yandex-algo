@@ -3,7 +3,7 @@ package ru.zentsova.yandex.sprint5
 // M. Просеивание вверх
 
 fun siftUp(heap: IntArray, idx: Int): Int {
-	if (idx == 1 || heap[idx] <= heap[idx / 2]) return idx
+	if (idx == 1 ||  heap[idx / 2] >= heap[idx]) return idx
 
 	heap.swap(idx, idx / 2)
 	return siftUp(heap, idx / 2)
@@ -11,7 +11,7 @@ fun siftUp(heap: IntArray, idx: Int): Int {
 
 fun siftUpLoop(heap: IntArray, idx: Int): Int {
 	var i = idx
-	while (i > 1 && heap[i] > heap[i / 2]) {
+	while (i != 1 && heap[i / 2] < heap[i]) {
 		heap.swap(i, i / 2)
 		i /= 2
 	}
