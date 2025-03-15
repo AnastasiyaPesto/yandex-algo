@@ -23,10 +23,9 @@ fun main() {
 	repeat(internsCount) {
 		internsMaxHeap.add(reader.intern, comparator())
 	}
-	val sortedInterns = Array(internsCount) {
-		internsMaxHeap.pop(comparator())
+	while (internsMaxHeap.isNotEmpty()) {
+		println(internsMaxHeap.pop(comparator())!!.login)
 	}
-	print(sortedInterns.joinToString(separator = "\n") { it!!.login })
 }
 
 private fun BufferedReader.readInt() = readLine().toInt()
@@ -42,7 +41,7 @@ private val BufferedReader.intern: Intern
 	}
 
 private fun comparator() =
-	compareByDescending<Intern> { it.taskCount }.thenBy { it.penaltyCount }.thenBy { it.login }
+	compareBy<Intern> { it.taskCount }.thenByDescending { it.penaltyCount }.thenByDescending { it.login }
 
 class Heap<T : Any> {
 	private val firstIndex = 1
@@ -57,24 +56,22 @@ class Heap<T : Any> {
 	}
 
 	fun pop(comparator: Comparator<in T>): T? {
-		val max = if (notEmpty()) {
+		val max = if (isNotEmpty()) {
 			val maxElem = heap[firstIndex]
 			heap[firstIndex] = null
 			capacity--
 			maxElem
 		} else null
 
-		if (notEmpty()) {
-			val lastElemIdx = heap.indexOfLast { it !== null }
-			heap[firstIndex] = heap[lastElemIdx]
-			heap[lastElemIdx] = null
+		if (isNotEmpty()) {
+			heap[firstIndex] = heap.removeAt(heap.lastIndex)
 			siftDown(firstIndex, comparator)
 		}
 
 		return max
 	}
 
-	private fun notEmpty(): Boolean = (heap.size > 1 && capacity != 0)
+	fun isNotEmpty(): Boolean = (heap.size > 1 && capacity != 0)
 
 	private fun siftUp(idx: Int, comparator: Comparator<in T>) {
 		if (idx == 1 || comparator.compare(heap[idx / 2], heap[idx]) >= 0) return
@@ -87,11 +84,11 @@ class Heap<T : Any> {
 		val left = 2 * idx
 		val right = left + 1
 
-		if (left >= heap.size) return
+		if (left > capacity) return
 
-		val largestIdx = if (right < heap.size && comparator.compare(heap[right], heap[left]) > 0) right else left
+		val largestIdx = if (right <= capacity && comparator.compare(heap[right], heap[left]) > 0) right else left
 
-		if (comparator.compare(heap[idx], heap[largestIdx]) < 0) {
+		if (comparator.compare(heap[largestIdx], heap[idx]) > 0) {
 			heap.swap(idx, largestIdx)
 			siftDown(largestIdx, comparator)
 		}
