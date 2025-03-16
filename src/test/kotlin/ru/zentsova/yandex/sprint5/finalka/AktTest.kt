@@ -75,27 +75,27 @@ class AktTest {
 		internsMaxHeap.add(timofey, comparator())
 
 		var actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
-//		assertThat(actual).isEqualTo(listOf(gena.login, timofey.login, gosha.login, rita.login, alla.login))
+		assertThat(actual).isEqualTo(listOf(alla.login, gena.login, gosha.login, rita.login, timofey.login))
 
 		var intern = internsMaxHeap.pop(comparator())
 		actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
 		assertThat(intern).isEqualTo(alla)
-//		assertThat(actual).isEqualTo(listOf(timofey.login, alla.login, gosha.login, rita.login))
+		assertThat(actual).isEqualTo(listOf(gena.login, rita.login, gosha.login, timofey.login))
 
 		intern = internsMaxHeap.pop(comparator())
 		actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
 		assertThat(intern).isEqualTo(gena)
-//		assertThat(actual).isEqualTo(listOf(alla.login, rita.login, gosha.login))
+		assertThat(actual).isEqualTo(listOf(gosha.login, rita.login, timofey.login))
 
 		intern = internsMaxHeap.pop(comparator())
 		actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
 		assertThat(intern).isEqualTo(gosha)
-//		assertThat(actual).isEqualTo(listOf(gosha.login, rita.login))
+		assertThat(actual).isEqualTo(listOf(rita.login, timofey.login))
 
 		intern = internsMaxHeap.pop(comparator())
 		actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
 		assertThat(intern).isEqualTo(rita)
-//		assertThat(actual).isEqualTo(listOf(rita.login))
+		assertThat(actual).isEqualTo(listOf(timofey.login))
 
 		intern = internsMaxHeap.pop(comparator())
 		actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
