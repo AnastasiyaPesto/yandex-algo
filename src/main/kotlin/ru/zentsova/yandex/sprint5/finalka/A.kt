@@ -43,7 +43,7 @@ fun main() {
 	val internsCount = reader.readInt()
 	val interns = reader.readInterns(internsCount)
 	heapSort(interns, comparator())
-	interns.forEach { println(it) }
+	interns.forEach { println(it.login) }
 }
 
 private fun BufferedReader.readInt() = readLine().toInt()
@@ -76,34 +76,21 @@ fun <T> heapSort(array: Array<T>, comparator: Comparator<T>) {
 	}
 }
 
-
 fun <T> siftDown(array: Array<T>, idx: Int, heapSize: Int, comparator: Comparator<T>) {
-//	var largest = idx
-//	val left = 2 * idx + 1
-//	val right = 2 * idx + 2
-//
-//	if (left < heapSize && comparator.compare(arr[left], arr[largest]) > 0) {
-//		largest = left
-//	}
-//	if (right < heapSize && comparator.compare(arr[right], arr[largest]) > 0) {
-//		largest = right
-//	}
-//
-//	if (largest != idx) {
-//		arr.swap(idx, largest)
-//		siftDown(arr, largest, heapSize, comparator)
-//	}
-
+	var largest = idx
 	val left = 2 * idx + 1
 	val right = 2 * idx + 2
 
-	if (left >= heapSize) return
+	if (left < heapSize && comparator.compare(array[left], array[largest]) > 0) {
+		largest = left
+	}
+	if (right < heapSize && comparator.compare(array[right], array[largest]) > 0) {
+		largest = right
+	}
 
-	val largestIdx = if (right < heapSize && comparator.compare(array[left], array[right]) > 0) right else left
-
-	if (comparator.compare(array[idx], array[largestIdx]) > 0) {
-		array.swap(idx, largestIdx)
-		siftDown(array, largestIdx, heapSize, comparator)
+	if (largest != idx) {
+		array.swap(idx, largest)
+		siftDown(array, largest, heapSize, comparator)
 	}
 }
 //
