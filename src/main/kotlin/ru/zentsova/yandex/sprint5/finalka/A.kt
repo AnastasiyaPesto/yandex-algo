@@ -36,85 +36,93 @@ n - кол-во элементов
 
 import java.io.BufferedReader
 
+fun comparator() = compareByDescending<Intern> { it.taskCount }.thenBy { it.penaltyCount }.thenBy { it.login }
+
 fun main() {
-  val reader = System.`in`.bufferedReader()
-  val internsCount = reader.readInt()
-  val internsMaxHeap = Heap<Intern>()
-  repeat(internsCount) {
-    internsMaxHeap.add(reader.intern, comparator())
-  }
-  while (internsMaxHeap.size > 1) {
-    println(internsMaxHeap.pop(comparator())!!.login)
-  }
+	val reader = System.`in`.bufferedReader()
+	val internsCount = reader.readInt()
+	val interns = reader.readInterns(internsCount)
+	heapSort(interns, comparator())
+	interns.forEach { println(it) }
 }
 
 private fun BufferedReader.readInt() = readLine().toInt()
 
-private val BufferedReader.intern: Intern
-  get() {
-    val (login, tasksCount, penaltiesCount) = readLine().split(" ")
-    return Intern(
-      login = login,
-      taskCount = tasksCount.toInt(),
-      penaltyCount = penaltiesCount.toInt()
-    )
-  }
+private fun BufferedReader.readInterns(n: Int) = Array(n) {
+	val (login, tasksCount, penaltiesCount) = readLine().split(" ")
+	Intern(
+		login = login,
+		taskCount = tasksCount.toInt(),
+		penaltyCount = penaltiesCount.toInt()
+	)
+}
 
 data class Intern(
-  val login: String,
-  val taskCount: Int,
-  val penaltyCount: Int,
+	val login: String,
+	val taskCount: Int,
+	val penaltyCount: Int,
 )
 
-private fun comparator() =
-  compareBy<Intern> { it.taskCount }.thenByDescending { it.penaltyCount }.thenByDescending { it.login }
+fun <T> heapSort(array: Array<T>, comparator: Comparator<T>) {
+	val n = array.size
 
-class Heap<T : Any> {
-  private val maxValueIdx = 1
-  val heap: MutableList<T?> = mutableListOf(null)
-  val size get() = heap.size
+	for (i in (n / 2 - 1) downTo 0) {
+		siftDown(array, i, n, comparator)
+	}
 
-  fun add(value: T, comparator: Comparator<in T>) {
-    heap.add(value)
-    siftUp(heap.lastIndex, comparator)
-  }
+	for (i in n - 1 downTo 1) {
+		array.swap(0, i)
+		siftDown(array, 0, i, comparator)
+	}
+}
 
-  fun pop(comparator: Comparator<in T>): T? = when {
-    size == 2 -> heap.removeAt(heap.lastIndex)
-    size > 2 -> {
-      val maxValue = heap[maxValueIdx]
-      heap[maxValueIdx] = heap.removeAt(heap.lastIndex)
-      siftDown(maxValueIdx, comparator)
-      maxValue
-    }
 
-    else -> null
-  }
+fun <T> siftDown(array: Array<T>, idx: Int, heapSize: Int, comparator: Comparator<T>) {
+//	var largest = idx
+//	val left = 2 * idx + 1
+//	val right = 2 * idx + 2
+//
+//	if (left < heapSize && comparator.compare(arr[left], arr[largest]) > 0) {
+//		largest = left
+//	}
+//	if (right < heapSize && comparator.compare(arr[right], arr[largest]) > 0) {
+//		largest = right
+//	}
+//
+//	if (largest != idx) {
+//		arr.swap(idx, largest)
+//		siftDown(arr, largest, heapSize, comparator)
+//	}
 
-  private fun siftUp(idx: Int, comparator: Comparator<in T>) {
-    if (idx == 1 || comparator.compare(heap[idx / 2], heap[idx]) >= 0) return
+	val left = 2 * idx + 1
+	val right = 2 * idx + 2
 
-    heap.swap(idx, idx / 2)
-    siftUp(idx / 2, comparator)
-  }
+	if (left >= heapSize) return
 
-  private fun siftDown(idx: Int, comparator: Comparator<in T>) {
-    val left = 2 * idx
-    val right = left + 1
+	val largestIdx = if (right < heapSize && comparator.compare(array[left], array[right]) > 0) right else left
 
-    if (left >= size) return
+	if (comparator.compare(array[idx], array[largestIdx]) > 0) {
+		array.swap(idx, largestIdx)
+		siftDown(array, largestIdx, heapSize, comparator)
+	}
+}
+//
+//	fun <T> siftDown(array: Array<T>, idx: Int, comparator: Comparator<in T>) {
+//		val left = 2 * idx + 1
+//		val right = 2 * idx + 2
+//
+//		if (left >= array.size) return
+//
+//		val largestIdx = if (right < array.size && comparator.compare(array[left], array[right]) > 0) right else left
+//
+//		if (comparator.compare(array[idx], array[largestIdx]) > 0) {
+//			array.swap(idx, largestIdx)
+//			siftDown(array, largestIdx, comparator)
+//		}
+//	}
 
-    val largestIdx = if (right < size && comparator.compare(heap[right], heap[left]) > 0) right else left
-
-    if (comparator.compare(heap[largestIdx], heap[idx]) > 0) {
-      heap.swap(idx, largestIdx)
-      siftDown(largestIdx, comparator)
-    }
-  }
-
-  private fun MutableList<T?>.swap(from: Int, to: Int) {
-    val tmp = this[from]
-    this[from] = this[to]
-    this[to] = tmp
-  }
+private fun <T> Array<T>.swap(i: Int, j: Int) {
+	val temp = this[i]
+	this[i] = this[j]
+	this[j] = temp
 }

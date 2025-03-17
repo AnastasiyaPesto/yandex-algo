@@ -4,12 +4,14 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class AktTest {
-	private val internsMaxHeap = Heap<Intern>()
 
 	@Test
 	fun add() {
+//		fun comparator() =
+//			compareBy<Intern> { it.taskCount }.thenByDescending { it.penaltyCount }.thenByDescending { it.login }
+
 		fun comparator() =
-			compareBy<Intern> { it.taskCount }.thenByDescending { it.penaltyCount }.thenByDescending { it.login }
+			compareByDescending<Intern> { it.taskCount }.thenBy { it.penaltyCount }.thenBy { it.login }
 
 		val alla = Intern("alla", 4, 100)
 		val gena = Intern("gena", 6, 1000)
@@ -17,50 +19,17 @@ class AktTest {
 		val rita = Intern("rita", 2, 90)
 		val timofey = Intern("timofey", 4, 80)
 
-		internsMaxHeap.add(alla, comparator())
-		internsMaxHeap.add(gena, comparator())
-		internsMaxHeap.add(gosha, comparator())
-		internsMaxHeap.add(rita, comparator())
-		internsMaxHeap.add(timofey, comparator())
+    val array = arrayOf(alla, gena, gosha, rita, timofey)
 
-		var actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
-		assertThat(actual).isEqualTo(listOf(gena.login, timofey.login, gosha.login, rita.login, alla.login))
+		heapSort(array, comparator())
 
-		var intern = internsMaxHeap.pop(comparator())
-		actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
-		assertThat(intern).isEqualTo(gena)
-		assertThat(actual).isEqualTo(listOf(timofey.login, alla.login, gosha.login, rita.login))
-
-		intern = internsMaxHeap.pop(comparator())
-		actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
-		assertThat(intern).isEqualTo(timofey)
-		assertThat(actual).isEqualTo(listOf(alla.login, rita.login, gosha.login))
-
-		intern = internsMaxHeap.pop(comparator())
-		actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
-		assertThat(intern).isEqualTo(alla)
-		assertThat(actual).isEqualTo(listOf(gosha.login, rita.login))
-
-		intern = internsMaxHeap.pop(comparator())
-		actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
-		assertThat(intern).isEqualTo(gosha)
-		assertThat(actual).isEqualTo(listOf(rita.login))
-
-		intern = internsMaxHeap.pop(comparator())
-		actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
-		assertThat(intern).isEqualTo(rita)
-		assertThat(actual).isEmpty()
-
-		intern = internsMaxHeap.pop(comparator())
-		actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
-		assertThat(intern).isNull()
-		assertThat(actual).isEmpty()
+		assertThat(array).isEqualTo(arrayOf(gena, timofey, alla, gosha, rita))
 	}
 
 	@Test
 	fun add1() {
 		fun comparator() =
-			compareBy<Intern> { it.taskCount }.thenByDescending { it.penaltyCount }.thenByDescending { it.login }
+			compareByDescending<Intern> { it.taskCount }.thenBy { it.penaltyCount }.thenBy { it.login }
 
 		val alla = Intern("alla", 0, 0)
 		val gena = Intern("gena", 0, 0)
@@ -68,50 +37,28 @@ class AktTest {
 		val rita = Intern("rita", 0, 0)
 		val timofey = Intern("timofey", 0, 0)
 
-		internsMaxHeap.add(alla, comparator())
-		internsMaxHeap.add(gena, comparator())
-		internsMaxHeap.add(gosha, comparator())
-		internsMaxHeap.add(rita, comparator())
-		internsMaxHeap.add(timofey, comparator())
+		val array = arrayOf(alla, gena, gosha, rita, timofey)
 
-		var actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
-		assertThat(actual).isEqualTo(listOf(alla.login, gena.login, gosha.login, rita.login, timofey.login))
+		heapSort(array, comparator())
 
-		var intern = internsMaxHeap.pop(comparator())
-		actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
-		assertThat(intern).isEqualTo(alla)
-		assertThat(actual).isEqualTo(listOf(gena.login, rita.login, gosha.login, timofey.login))
-
-		intern = internsMaxHeap.pop(comparator())
-		actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
-		assertThat(intern).isEqualTo(gena)
-		assertThat(actual).isEqualTo(listOf(gosha.login, rita.login, timofey.login))
-
-		intern = internsMaxHeap.pop(comparator())
-		actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
-		assertThat(intern).isEqualTo(gosha)
-		assertThat(actual).isEqualTo(listOf(rita.login, timofey.login))
-
-		intern = internsMaxHeap.pop(comparator())
-		actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
-		assertThat(intern).isEqualTo(rita)
-		assertThat(actual).isEqualTo(listOf(timofey.login))
-
-		intern = internsMaxHeap.pop(comparator())
-		actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
-		assertThat(intern).isEqualTo(timofey)
-		assertThat(actual).isEmpty()
-
-		intern = internsMaxHeap.pop(comparator())
-		actual = internsMaxHeap.heap.mapNotNull { it }.map { it.login }
-		assertThat(intern).isNull()
-		assertThat(actual).isEmpty()
+		assertThat(array).isEqualTo(arrayOf(alla, gena, gosha, rita, timofey))
 	}
 
 	@Test
 	fun comparatorTest() {
-		fun comparator1() = compareBy<Int> { it }
+		fun comparatorInt() = compareBy<Int> { it }
+		assertThat(comparatorInt().compare(6, 4)).isGreaterThan(0)
 
-		assertThat(comparator1().compare(6, 4)).isGreaterThan(0)
+		fun comparatorString() = compareBy<String> { it }
+		assertThat(comparatorString().compare("a", "a")).isEqualTo(0)
+		assertThat(comparatorString().compare("abb", "alla")).isLessThan(0)
+		assertThat(comparatorString().compare("aab", "aa")).isGreaterThan(0)
+		assertThat(comparatorString().compare("aaa", "aa")).isGreaterThan(0)
+
+		assertThat(comparatorString().compare("alla", "gena")).isLessThan(0)
+		assertThat(comparatorString().compare("gena", "gosha")).isLessThan(0)
+		assertThat(comparatorString().compare("gosha", "rita")).isLessThan(0)
+		assertThat(comparatorString().compare("rita", "timofey")).isLessThan(0)
+		assertThat(comparatorString().compare("rita", "gosha")).isGreaterThan(0)
 	}
 }
