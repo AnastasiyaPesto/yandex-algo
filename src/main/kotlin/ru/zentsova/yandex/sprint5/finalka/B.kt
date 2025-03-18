@@ -48,27 +48,18 @@ class Node(var left: Node?, var right: Node?, var value: Int)
 fun remove(root: Node?, key: Int): Node? {
   if (root === null) return null
 
-  return when {
-    (key < root.value) -> {
-      root.left = remove(root.left, key)
-      root
+  var vertex = root
+  when {
+    (key < vertex.value) -> vertex.left = remove(vertex.left, key)
+    (key > vertex.value) -> vertex.right = remove(vertex.right, key)
+    vertex.left === null -> vertex = root.right
+    vertex.right === null -> vertex = root.left
+    else -> {
+      vertex.value = vertexWithMaxValue(root.left!!).value
+      vertex.left = remove(root.left, root.value)
     }
-
-    (key > root.value) -> {
-      root.right = remove(root.right, key)
-      root
-    }
-
-    root.left !== null && root.right !== null -> {
-      root.value = vertexWithMaxValue(root.left!!).value
-      root.left = remove(root.left, root.value)
-      root
-    }
-
-    root.left !== null -> root.left
-    root.right !== null -> root.right
-    else -> null
   }
+  return vertex
 }
 
 fun vertexWithMaxValue(root: Node): Node = root.right?.let { vertexWithMaxValue(it) } ?: root
