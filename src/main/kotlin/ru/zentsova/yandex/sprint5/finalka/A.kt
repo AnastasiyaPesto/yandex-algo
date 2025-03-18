@@ -2,19 +2,18 @@ package ru.zentsova.yandex.sprint5.finalka
 
 /*
 -- Спринт 5. Финалка. A. Пирамидальная сортировка --
-Ссылка на удачную посылку: https://contest.yandex.ru/contest/24810/run-report/134973138/
-Ссылка после исправлений 1-го ревью: https://contest.yandex.ru/contest/24810/run-report/135072515/
+Ссылка на удачную посылку: https://contest.yandex.ru/contest/24810/run-report/135172715/
 
 -- ПРИНЦИП РАБОТЫ --
 Пирамидальная сортировка осуществляется с использованием бинарной кучи (пирамиды).
 Пирамида (binary heap) — это структура данных, представляющая собой объект-массив, который можно рассматривать как почти полное бинарное дерево.
-По факту это массив, где нет пробелов между элементами (кроме элемента с индексом 0). По этому индексу в моём варианте хранится null.
+По факту это массив, где нет пробелов между элементами. Итерация с 0 индекса.
 Так же соблюдаются условия A[parent(i)] >= A[i] для max-heap и A[parent(i)] <= A[i] для min-heap.
 
 Краткое описание алгоритма:
 1. Метод heapSort() принимает неупорядоченный массив и компаратор.
 2. Выполняется построение кучи за линейное время.
-   Перестановка нужна только для вершин, у которых есть хотя бы один ребёнок. Листы уже упорядочены.
+   Перестановка нужна только для вершин, у которых есть хотя бы один ребёнок. Листы просеивать "некуда".
    Поэтому начиная с n/2 до 0 все элементы просеиваются вниз.
 3. Когда бинарная куча построена, чтобы не использовать дополнительную память для хранения отсортированного массива,
    производим перестановки на этом же массиве (куче). Начиная с последнего элемента каждый раз меняем с первым элементом и просеиваем его вниз.
@@ -45,7 +44,7 @@ fun main() {
 	val reader = System.`in`.bufferedReader()
 	val internsCount = reader.readInt()
 	val interns = reader.readInterns(internsCount)
-	heapSort(interns, comparator())
+	interns.heapSort(comparator())
 	interns.forEach { println(it.login) }
 }
 
@@ -66,16 +65,16 @@ data class Intern(
 	val penaltyCount: Int,
 )
 
-fun <T> heapSort(array: Array<T>, comparator: Comparator<T>) {
-	val n = array.size
+fun <T> Array<T>.heapSort(comparator: Comparator<T>) {
+	val n = this.size
 
 	for (i in (n / 2 - 1) downTo 0) {
-		siftDown(array, i, n, comparator)
+		siftDown(this, i, n, comparator)
 	}
 
 	for (i in n - 1 downTo 1) {
-		array.swap(0, i)
-		siftDown(array, 0, i, comparator)
+		this.swap(0, i)
+		siftDown(this, 0, i, comparator)
 	}
 }
 

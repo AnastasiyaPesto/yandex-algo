@@ -2,8 +2,7 @@ package ru.zentsova.yandex.sprint5.finalka
 
 /*
 -- Спринт 5. Финалка. B. Удали узел --
-Ссылка на удачную посылку: https://contest.yandex.ru/contest/24810/run-report/135033001/
-Ссылка после исправлений 1-го ревью: https://contest.yandex.ru/contest/24810/run-report/135144448/
+Ссылка на удачную посылку: https://contest.yandex.ru/contest/24810/run-report/135175128/
 
 -- ПРИНЦИП РАБОТЫ --
 1. Ищем узел, который необходимо удалить (сравнивая value и key)
@@ -34,7 +33,7 @@ package ru.zentsova.yandex.sprint5.finalka
 
 -- ВРЕМЕННАЯ СЛОЖНОСТЬ --
 
-O(H), где H — высота дерева, где H = logN (N - количество элементов в бинарном дереве поиска)
+O(H), где H — высота дерева, где H = N (N - количество элементов в бинарном дереве поиска, если дерево не сбалансировано)
 
 -- ПРОСТРАНСТВЕННАЯ СЛОЖНОСТЬ --
 
@@ -47,40 +46,43 @@ class Node(var left: Node?, var right: Node?, var value: Int)
 // <template>
 
 fun remove(root: Node?, key: Int): Node? {
-	if (root === null) return null
+  if (root === null) return null
 
-	var vertex = root
-	when {
-		(key < vertex.value) -> vertex.left = remove(vertex.left, key)
-		(key > vertex.value) -> vertex.right = remove(vertex.right, key)
-		else -> vertex = removeNode(root)
-	}
-	return vertex
+  return when {
+    (key < root.value) -> {
+      root.left = remove(root.left, key)
+      root
+    }
+
+    (key > root.value) -> {
+      root.right = remove(root.right, key)
+      root
+    }
+
+    root.left !== null && root.right !== null -> {
+      root.value = vertexWithMaxValue(root.left!!).value
+      root.left = remove(root.left, root.value)
+      root
+    }
+
+    root.left !== null -> root.left
+    root.right !== null -> root.right
+    else -> null
+  }
 }
 
 fun vertexWithMaxValue(root: Node): Node = root.right?.let { vertexWithMaxValue(it) } ?: root
 
-fun removeNode(vertex: Node): Node? = when {
-	vertex.left !== null && vertex.right !== null -> {
-		vertex.value = vertexWithMaxValue(vertex.left!!).value
-		vertex.left = remove(vertex.left, vertex.value)
-		vertex
-	}
-	vertex.left !== null -> vertex.left
-	vertex.right !== null -> vertex.right
-	else -> null
-}
-
 fun test() {
-	val node1 = Node(null, null, 2)
-	val node2 = Node(node1, null, 3)
-	val node3 = Node(null, node2, 1)
-	val node4 = Node(null, null, 6)
-	val node5 = Node(node4, null, 8)
-	val node6 = Node(node5, null, 10)
-	val node7 = Node(node3, node6, 5)
-	val newHead = remove(node7, 10)
-	assert(newHead!!.value == 5)
-	assert(newHead?.right == node5)
-	assert(newHead?.right!!.value == 8)
+  val node1 = Node(null, null, 2)
+  val node2 = Node(node1, null, 3)
+  val node3 = Node(null, node2, 1)
+  val node4 = Node(null, null, 6)
+  val node5 = Node(node4, null, 8)
+  val node6 = Node(node5, null, 10)
+  val node7 = Node(node3, node6, 5)
+  val newHead = remove(node7, 10)
+  assert(newHead!!.value == 5)
+  assert(newHead?.right == node5)
+  assert(newHead?.right!!.value == 8)
 }
