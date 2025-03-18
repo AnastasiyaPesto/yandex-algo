@@ -3,6 +3,7 @@ package ru.zentsova.yandex.sprint5.finalka
 /*
 -- Спринт 5. Финалка. B. Удали узел --
 Ссылка на удачную посылку: https://contest.yandex.ru/contest/24810/run-report/135033001/
+Ссылка после исправлений 1-го ревью: https://contest.yandex.ru/contest/24810/run-report/135144448/
 
 -- ПРИНЦИП РАБОТЫ --
 1. Ищем узел, который необходимо удалить (сравнивая value и key)
