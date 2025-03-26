@@ -1,5 +1,7 @@
 package ru.zentsova.yandex.sprint6
 
+// B. Перевести список ребер в матрицу смежности
+
 fun main() {
 	val (vertexCount, edgeCount) = readGraphData()
 	val adjacencyMatrix = Array(vertexCount) { IntArray(vertexCount) }

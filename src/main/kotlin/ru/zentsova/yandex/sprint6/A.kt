@@ -1,5 +1,7 @@
 package ru.zentsova.yandex.sprint6
 
+// A. Построить список смежности
+
 fun main() {
   val (vertexCount, edgeCount) = readGraphData()
 	val adjacencyList = mutableMapOf<Int, MutableList<Int>>()
@@ -16,4 +18,4 @@ fun main() {
 }
 
 private fun readInts() = readln().split(" ").map(String::toInt)
-private fun readGraphData(): Pair<Int, Int> = readInts().let { it[0] to it[1] }
+private fun readGraphData(): Pair<Int, Int> = readInts().let { it.first() to it.last() }
