@@ -1,6 +1,5 @@
 package ru.zentsova.yandex.sprint6
 
-import ru.zentsova.yandex.sprint6.Color.*
 import java.util.*
 
 // C. DFS
@@ -8,41 +7,35 @@ import java.util.*
 fun main() {
 	val (vertexCount, edgeCount) = readGraphData()
 
-	val vertexColor = Array(vertexCount) { WHITE }
-
-	val adjacencyMatrix = Array(vertexCount) { arrayOf<Int>() }
-	for (i in 0 until edgeCount) {
-		adjacencyMatrix[i] = Array(i + 1) { 0 }
-	}
-
-	for (i in 0 until edgeCount) {
+	val adjacencyList = Array(vertexCount) { mutableListOf<Int>() }
+	repeat(edgeCount) {
 		val (from, to) = readInts()
-		val (v1, v2) = maxOf(from, to) to minOf(from, to)
-		adjacencyMatrix[v1 - 1][v2 - 1] = 1
+		adjacencyList[from - 1].add(to - 1)
+		adjacencyList[to - 1].add(from - 1)
 	}
+
 	val startVertex = readInt()
-	val dfsResult = dfs(adjacencyMatrix, startVertex, vertexColor)
+	val dfsResult = dfs(adjacencyList, startVertex)
 	print(dfsResult.joinToString(" "))
 }
 
-private fun dfs(adjacencyMatrix: Array<Array<Int>>, startVertex: Int, vertexColor: Array<Color>): List<Int> {
+private fun dfs(adjacencyList: Array<MutableList<Int>>, startVertex: Int): List<Int> {
 	val result = mutableListOf<Int>()
+	val visited = BooleanArray(adjacencyList.size)
 	val stack: Stack<Int> = Stack()
+
+	adjacencyList.forEach { it.sortDescending() }
+
 	stack.push(startVertex - 1)
 	while (stack.isNotEmpty()) {
 		val v = stack.pop()
-		if (vertexColor[v] == WHITE) {
-			vertexColor[v] = GREY
-			result.add(v + 1)
-			stack.push(v)
-			val adjacentVertices = adjacencyMatrix[v]
-			adjacentVertices.forEachIndexed { vertex, value ->
-				if (value != 0 && vertexColor[vertex] == WHITE) {
-					stack.push(vertex)
-				}
-			}
-		} else if (vertexColor[v] == GREY) {
-			vertexColor[v] = BLACK
+		if (visited[v]) continue
+
+		visited[v] = true
+		result.add(v + 1)
+
+		adjacencyList[v].forEach { neighbor ->
+			if (!visited[neighbor]) stack.push(neighbor)
 		}
 	}
 	return result
@@ -51,9 +44,3 @@ private fun dfs(adjacencyMatrix: Array<Array<Int>>, startVertex: Int, vertexColo
 private fun readInt() = readln().toInt()
 private fun readInts() = readln().split(" ").map(String::toInt)
 private fun readGraphData(): Pair<Int, Int> = readInts().let { it.first() to it.last() }
-
-private enum class Color {
-	WHITE,
-	GREY,
-	BLACK
-}
