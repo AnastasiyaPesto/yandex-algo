@@ -7,6 +7,7 @@ import java.util.*
 fun main() {
 	val (vertexCount, edgeCount) = readGraphData()
 
+	// список смежностей
 	val adjacencyList = Array(vertexCount) { mutableListOf<Int>() }
 	repeat(edgeCount) {
 		val (from, to) = readInts()
