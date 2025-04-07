@@ -5,32 +5,48 @@ import java.util.*
 // J. Топологическая сортировка
 fun main() {
 	val (vertexCount, edgeCount) = readGraphData()
+	// список смежностей
 	val adjacencyList = Array(vertexCount) { mutableListOf<Int>() }
 	repeat(edgeCount) {
 		val (from, to) = readInts()
 		adjacencyList[from - 1].add(to - 1)
 	}
 
-	val sorted = Stack<Int>()
-	val color = Array(vertexCount) { "white" }
-	for (i in 0 until vertexCount) {
-		sorted.addAll(topologicalSort(adjacencyList, i, color))
-	}
-
-	print(sorted.joinToString(separator = " ") { "${it + 1}"})
+	val sorted = topologicalSort(adjacencyList)
+	print(sorted.reversed().joinToString(separator = " ") { "${it + 1}"})
 }
 
-private fun topologicalSort(adjacencyList: Array<MutableList<Int>>, v: Int, color: Array<String>): Stack<Int> {
+private fun topologicalSort(adjacencyList:  Array<MutableList<Int>>): Stack<Int> {
 	val result = Stack<Int>()
+	val colors = Array(adjacencyList.size) { -1 }
 
-	color[v] = "gray"
-	for (w in adjacencyList[v]) {
-		if (color[w] == "white") {
-			topologicalSort(adjacencyList, w, color)
+	for (i in adjacencyList.indices) {
+		if (colors[i] == -1) {
+			val s = Stack<Int>()
+			s.push(i)
+
+			while (s.isNotEmpty()) {
+				val v = s.pop()
+				if (colors[v] == -1) {
+					colors[v] = 0
+					s.push(v)
+
+					adjacencyList[v].sortDescending()
+
+					for (j in 0 until adjacencyList[v].size) {
+						if (colors[adjacencyList[v][j]] == -1) {
+							s.push(adjacencyList[v][j])
+						}
+					}
+				} else {
+					if (colors[v] == 0) {
+						result.push(v)
+						colors[v] = 1
+					}
+				}
+			}
 		}
 	}
-	color[v] = "black"
-	result.push(v)
 
 	return result
 }
