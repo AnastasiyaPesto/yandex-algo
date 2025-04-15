@@ -2,19 +2,17 @@ package ru.zentsova.yandex.sprint6.finalka
 
 /*
 -- Спринт 6. Финалка. A. Дорогая сеть --
-Ссылка на удачную посылку: https://contest.yandex.ru/contest/25070/run-report/136609081/
+Ссылка на удачную посылку: https://contest.yandex.ru/contest/25070/run-report/136811848/
 
 -- ПРИНЦИП РАБОТЫ --
 Алгоритм:
 1. Считывание данных (читываю через BufferedReader):
-Заполняю две структуры данных - adjacencyList и edgesWeight:
+Заполняю структуру данных - graph: Array<List<Edge>>:
 
-adjacencyList - списки смежностей, чтобы для каждой вершины получить соседние.
-edgesWeight - матрица смежносте, где в ячейке лежит вес ребра. Это нужно для быстрого доступа к весу ребра.
+Список ребер (ребро в формате - конечная веришна + вес ребра).
+Начало ребра это первый индекс массива.
 
-Причем вес выбираю максимальный из двух, если между вершинами есть два ребра (т.к. граф ненаправленный, то так делать можно).
-
-2. fun maxSpanningTree(adjacencyList, edgesWeight, vertexCount)
+2. fun maxSpanningTree(graph)
 Начинаю с вершины 0. Помечаю ее как посещенную. Для этого заведен массив visited: Array<Boolean>.
 Здесь же завожу счетчик (visitedCount), чтобы считать кол-во посещеных вершин, это поможет за константное время сделать вывод
 о количестве компонент связности.
@@ -39,6 +37,10 @@ edgesWeight - матрица смежносте, где в ячейке лежи
 -- ВРЕМЕННАЯ СЛОЖНОСТЬ --
 O(∣E∣⋅log∣V∣), где ∣E∣ — количество рёбер в графе, а ∣V∣ — количество вершин.
 
+Тут мне было не супер понятно, но смею предоложить, что зависимость от вершин (несмотря на то, что в куче хранятся ребра),
+потому что каждый раз мы ищем ребра, которые исходят из каждой вершины.
+Обрабатываем вершину один раз, а потом добавляем все ребра, исходящие из нее и работаем с ними.
+
 -- ПРОСТРАНСТВЕННАЯ СЛОЖНОСТЬ --
 O(∣V∣) - массив для учета посещенных вершин (visited), где ∣V∣ — количество вершин в графе.
 O(|E|) - приоритетная очеред, где ∣E∣ — количество рёбер в графе
@@ -55,47 +57,37 @@ fun main() {
 	val reader = System.`in`.bufferedReader()
 	val (vertexCount, edgeCount) = reader.readVertexAndEdgeCount()
 
-	val (edgesWeight, adjacencyList) = reader.readGraph(vertexCount, edgeCount)
-	val maxWeight = maxSpanningTree(adjacencyList, edgesWeight, vertexCount)
+	val graph = reader.readGraph(vertexCount, edgeCount)
+	val maxWeight = maxSpanningTree(graph)
 	println(maxWeight ?: "Oops! I did it again")
 }
 
-fun maxSpanningTree(
-	adjacencyList: Array<MutableList<Int>>,
-	edgesWeight: Array<IntArray>,
-	vertexCount: Int,
-): Int? {
-	if (vertexCount == 1) return 0
-	if (edgesWeight.isEmpty()) return null
-
+fun maxSpanningTree(graph: Array<MutableList<Edge>>): Int? {
 	var totalWeight = 0
-	val visited = BooleanArray(vertexCount)
-	val heap = PriorityQueue<Pair<Int, Int>>(compareByDescending { it.second })
+	val visited = BooleanArray(graph.size)
+	val heap = PriorityQueue<Edge>(compareByDescending { it.weight })
+	var visitedCount = 0
 
-	var visitedCount = 1
-	visited[0] = true
-	adjacencyList[0].forEach { neighbor ->
-		val weight = edgesWeight[0][neighbor]
-		heap.add(neighbor to weight)
-	}
-
-	while (heap.isNotEmpty()) {
-		val (v, w) = heap.poll()
-		if (!visited[v]) {
-			visited[v] = true
-			visitedCount++
-			totalWeight += w
-
-			adjacencyList[v].forEach { u ->
-				if (!visited[u]) {
-					val edgeWeight = edgesWeight[v][u]
-					heap.add(u to edgeWeight)
-				}
+	fun visitVertex(v: Int) {
+		visited[v] = true
+		visitedCount++
+		graph[v].forEach { edge ->
+			if (!visited[edge.to]) {
+				heap.add(edge)
 			}
 		}
 	}
 
-	return if (visitedCount != vertexCount) null else totalWeight
+	visitVertex(0)
+	while (heap.isNotEmpty()) {
+		val edge = heap.poll()
+		if (!visited[edge.to]) {
+			totalWeight += edge.weight
+			visitVertex(edge.to)
+		}
+	}
+
+	return if (visitedCount != graph.size) null else totalWeight
 }
 
 private fun BufferedReader.readInts() = readLine().split(" ").map(String::toInt)
@@ -103,22 +95,17 @@ private fun BufferedReader.readInts() = readLine().split(" ").map(String::toInt)
 private fun BufferedReader.readVertexAndEdgeCount(): Pair<Int, Int> =
 	readInts().let { it.first() to it.last() }
 
-private fun BufferedReader.readGraph(
-	vertexCount: Int,
-	edgeCount: Int
-): Pair<Array<IntArray>, Array<MutableList<Int>>> {
-	val edgesWeight = Array(vertexCount) { IntArray(vertexCount) }
-	val adjacencyList = Array(vertexCount) { mutableListOf<Int>() }
+private fun BufferedReader.readGraph(vertexCount: Int, edgeCount: Int): Array<MutableList<Edge>> {
+	val graph = Array(vertexCount) { mutableListOf<Edge>() }
 
 	repeat(edgeCount) {
-		val (from, to, weight) = readInts().let { Triple(it[0] - 1, it[1] - 1, it[2]) }
+		val (from, to, weight) = readInts()
 
-		edgesWeight[from][to] = maxOf(edgesWeight[from][to], weight)
-		edgesWeight[to][from] = maxOf(edgesWeight[to][from], weight)
-
-		adjacencyList[from].add(to)
-		adjacencyList[to].add(from)
+		graph[from - 1].add(Edge(to - 1, weight))
+		graph[to - 1].add(Edge(from - 1, weight))
 	}
 
-	return edgesWeight to adjacencyList
+	return graph
 }
+
+data class Edge(val to: Int, val weight: Int)
