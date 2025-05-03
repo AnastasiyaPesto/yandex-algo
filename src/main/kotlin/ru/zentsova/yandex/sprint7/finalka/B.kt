@@ -23,11 +23,13 @@ package ru.zentsova.yandex.sprint7.finalka
 O(nk) - где n длина массива, k - целевое число (target)
 
 -- ПРОСТРАНСТВЕННАЯ СЛОЖНОСТЬ --
+
 O(k) - где k это target, для доп хранения массива dp
+
 */
 
 fun main() {
-  readInt()
+	readInt()
 	val partyPoints = readInts()
 	val canBeDivided = canBeDivided(partyPoints)
 	println(if (canBeDivided) "True" else "False")
