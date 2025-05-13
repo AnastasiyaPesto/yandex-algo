@@ -1,12 +1,13 @@
 package ru.zentsova.yandex.sprint8
 
+// E. Вставка строк
 fun main() {
-	val s = readLine()!!
-	val n = readLine()!!.toInt()
+	val s = readln()
+	val n = readln().toInt()
 	val insertions = Array(s.length + 1) { mutableListOf<String>() }
 
 	repeat(n) {
-		val (t, kStr) = readLine()!!.split(" ")
+		val (t, kStr) = readln().split(" ")
 		val k = kStr.toInt()
 		insertions[k].add(t)
 	}
