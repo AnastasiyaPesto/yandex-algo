@@ -2,8 +2,8 @@ package ru.zentsova.yandex.sprint8
 
 // K. Сравнить две строки
 fun main() {
-	val a = readLine()!!
-	val b = readLine()!!
+	val a = readln()
+	val b = readln()
 
 	val filteredA = filterEvenAlphabetLetters(a)
 	val filteredB = filterEvenAlphabetLetters(b)
