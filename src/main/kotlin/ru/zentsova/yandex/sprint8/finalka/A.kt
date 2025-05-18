@@ -35,10 +35,10 @@ https://new.contest.yandex.ru/contests/26133/problem?id=51450%2F2020_07_22%2FLxm
 
 
 -- ВРЕМЕННАЯ СЛОЖНОСТЬ --
-O(L) - где L  суммарная длина всех распакованных строк
+O(L) - где L суммарная длина всех распакованных строк
 
 -- ПРОСТРАНСТВЕННАЯ СЛОЖНОСТЬ --
-O(L) - где L  суммарная длина всех распакованных строк
+O(L) - где L суммарная длина всех распакованных строк
 
 */
 
@@ -65,7 +65,7 @@ fun unpackFrom(s: String, start: Int): Pair<String, Int> {
 			s[i].isDigit() -> {
 				var num = 0
 				while (s[i].isDigit()) {
-					num = num * 10 + (s[i] - '0')
+					num = num * 10 + s[i].digitToInt()
 					i++
 				}
 				if (s[i] == '[') {
@@ -87,16 +87,20 @@ fun unpackFrom(s: String, start: Int): Pair<String, Int> {
 
 fun longestCommonPrefix(strings: List<String>): String {
 	if (strings.isEmpty()) return ""
-	var prefix = strings[0]
+
+	val first = strings[0]
+	var prefixLength = first.length
+
 	for (i in 1 until strings.size) {
 		val current = strings[i]
-		val minLength = minOf(prefix.length, current.length)
+		val minLength = minOf(prefixLength, current.length)
 		var j = 0
-		while (j < minLength && prefix[j] == current[j]) j++
-		prefix = prefix.substring(0, j)
-		if (prefix.isEmpty()) break
+		while (j < minLength && first[j] == current[j]) j++
+		prefixLength = j
+		if (prefixLength == 0) break
 	}
-	return prefix
+
+	return first.substring(0, prefixLength)
 }
 
 private fun readInt() = readln().toInt()
