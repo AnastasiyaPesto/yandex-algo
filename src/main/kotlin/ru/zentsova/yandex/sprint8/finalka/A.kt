@@ -2,8 +2,7 @@ package ru.zentsova.yandex.sprint8.finalka
 
 /*
 -- Спринт 8. Финалка. A. Packed Prefix --
-Ссылка на удачную посылку:
-https://new.contest.yandex.ru/contests/26133/problem?id=51450%2F2020_07_22%2FLxm8FGkQIC&tab=submissions&submissionId=10000068-278e-9948-952e-ef98bf9bc6a3
+ID удачной посылки: 138534421
 
 -- ПРИНЦИП РАБОТЫ --
 
@@ -36,23 +35,34 @@ https://new.contest.yandex.ru/contests/26133/problem?id=51450%2F2020_07_22%2FLxm
 
 -- ВРЕМЕННАЯ СЛОЖНОСТЬ --
 O(L) - где L суммарная длина всех распакованных строк
+- рекурсивная распаковка - работа функции пропорциональна длине распакованной строки
+O(L1 + L1 + ... + Ln) = O(L)
+- поиск префикса
+в худшем случае проходим по всей длине префикса между строками =>
+O(L) общий префикс не может быть длиннее полной распакованной строки
+
 
 -- ПРОСТРАНСТВЕННАЯ СЛОЖНОСТЬ --
 O(L) - где L суммарная длина всех распакованных строк
-
+после распаковки в списке unpackedStrings — n строк общей длиной L
+в каждый момент времени sb используется для одной строки, и после этого превращается в String => O(L)
 */
 
 fun main() {
 	val n = readInt()
 	val compressedStrings = List(n) { readln() }
 
-	val unpackedStrings = compressedStrings.map { unpackFrom(it, 0).first }
+	val unpackedStrings = compressedStrings.map { compressed ->
+		val sb = StringBuilder()
+		unpackFrom(compressed, 0, sb)
+		sb.toString()
+	}
+
 	val prefix = longestCommonPrefix(unpackedStrings)
 	println(prefix)
 }
 
-fun unpackFrom(s: String, start: Int): Pair<String, Int> {
-	val sb = StringBuilder()
+fun unpackFrom(s: String, start: Int, sb: StringBuilder): Int {
 	var i = start
 
 	while (i < s.length) {
@@ -63,26 +73,21 @@ fun unpackFrom(s: String, start: Int): Pair<String, Int> {
 			}
 
 			s[i].isDigit() -> {
-				var num = 0
-				while (s[i].isDigit()) {
-					num = num * 10 + s[i].digitToInt()
-					i++
-				}
-				if (s[i] == '[') {
-					i++
-					val (sub, newPos) = unpackFrom(s, i)
-					repeat(num) { sb.append(sub) }
-					i = newPos
-				}
+				val num = s[i].digitToInt()
+				i += 2
+				val innerStart = sb.length
+				i = unpackFrom(s, i, sb)
+				val inner = sb.substring(innerStart)
+				repeat(num - 1) { sb.append(inner) }
 			}
 
 			s[i] == ']' -> {
-				return Pair(sb.toString(), i + 1)
+				return i + 1
 			}
 		}
 	}
 
-	return Pair(sb.toString(), i)
+	return i
 }
 
 fun longestCommonPrefix(strings: List<String>): String {
