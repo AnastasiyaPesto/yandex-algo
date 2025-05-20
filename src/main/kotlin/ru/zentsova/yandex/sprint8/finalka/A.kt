@@ -2,7 +2,7 @@ package ru.zentsova.yandex.sprint8.finalka
 
 /*
 -- Спринт 8. Финалка. A. Packed Prefix --
-ID удачной посылки: 138534421
+ID удачной посылки: 138633410
 
 -- ПРИНЦИП РАБОТЫ --
 
@@ -50,38 +50,34 @@ O(L) - где L суммарная длина всех распакованны�
 
 fun main() {
 	val n = readInt()
-	val compressedStrings = List(n) { readln() }
-
-	val unpackedStrings = compressedStrings.map { compressed ->
-		val sb = StringBuilder()
-		unpackFrom(compressed, 0, sb)
-		sb.toString()
+	val unpackedStrings = Array(n) {
+		val str = readln()
+		buildString { str.unpackFrom(0, this) }
 	}
 
 	val prefix = longestCommonPrefix(unpackedStrings)
 	println(prefix)
 }
 
-fun unpackFrom(s: String, start: Int, sb: StringBuilder): Int {
+fun String.unpackFrom(start: Int, sb: StringBuilder): Int {
 	var i = start
 
-	while (i < s.length) {
+	while (i < length) {
 		when {
-			s[i].isLetter() -> {
-				sb.append(s[i])
+			this[i].isLetter() -> {
+				sb.append(this[i])
 				i++
 			}
 
-			s[i].isDigit() -> {
-				val num = s[i].digitToInt()
-				i += 2
+			this[i].isDigit() -> {
+				val num = this[i].digitToInt()
 				val innerStart = sb.length
-				i = unpackFrom(s, i, sb)
-				val inner = sb.substring(innerStart)
+				i = unpackFrom(i + 2, sb)
+				val inner = sb.subSequence(innerStart, sb.length)
 				repeat(num - 1) { sb.append(inner) }
 			}
 
-			s[i] == ']' -> {
+			this[i] == ']' -> {
 				return i + 1
 			}
 		}
@@ -90,7 +86,7 @@ fun unpackFrom(s: String, start: Int, sb: StringBuilder): Int {
 	return i
 }
 
-fun longestCommonPrefix(strings: List<String>): String {
+fun longestCommonPrefix(strings: Array<String>): String {
 	if (strings.isEmpty()) return ""
 
 	val first = strings[0]
