@@ -2,57 +2,77 @@ package ru.zentsova.yandex.sprint8.finalka
 
 /*
 -- Спринт 8. Финалка. B. Шпаргалка --
-ID удачной посылки: 138528667
+ID удачной посылки: 138631825
 
 -- ПРИНЦИП РАБОТЫ --
-Алгоритм проверяет, можно ли разбить строку t на слова из словаря, используя динамическое программирование:
+Используем динамическое программирование и префиксное дерево (бор).
 dp[i] = true, если префикс t[0..i-1] можно разбить на слова из словаря.
-Начинаем с dp[0] = true (пустая строка).
-Для каждого индекса i пробуем все слова: если слово подходит к позиции i и префикс перед ним разбиваемый, ставим dp[i] = true.
-Ответ — значение dp[t.length]: можно ли разбить всю строку.
+Из каждой позиции i, где dp[i] = true, идём по бору и отмечаем все возможные окончания слов.
+Ответ — dp[t.length].
 
 -- ДОКАЗАТЕЛЬСТВО КОРРЕКТНОСТИ --
-Алгоритм корректен, потому что он перебирает все возможные разбиения строки t на суффиксы,
-соответствующие словам из словаря, и использует dp для хранения информации о допустимости каждого префикса.
-Если dp[i] = true, это значит, что строку t[0..i-1] можно разбить на слова из словаря,
-и это достигается только если ранее построенные корректные разбиения тоже верны.
-Таким образом, если dp[t.length] = true, значит, существует последовательность слов, полностью покрывающая t.
+Алгоритм корректен, так как перебирает все возможные разбиения строки t,
+помечая dp[i] = true, только если до этого была достижима корректная разбивка и найдено слово в боре.
+Если dp[t.length] = true, строка разбивается полностью.
 
 -- ВРЕМЕННАЯ СЛОЖНОСТЬ --
 O(Lm) - где L - длина строки t, m - максимальная длина слова в словаре
 
 -- ПРОСТРАНСТВЕННАЯ СЛОЖНОСТЬ --
-O(Lm) - где L - длина строки t (хранения dp), m - максимальная длина слова в словаре
+O(LS) - где L - длина строки t (хранения dp), S — суммарная длина всех слов в словаре (размер бора)
 */
 
 fun main() {
 	val line = readln()
 	val n = readInt()
-	val dictionary = buildSet {
-		repeat(n) {
-			add(readln())
-		}
-	}
-	println(if (canSplitText(line, dictionary)) "YES" else "NO")
+	val trie = Trie()
+	repeat(n) { trie.add(readln()) }
+	println(if (canSplitText(line, trie)) "YES" else "NO")
 }
 
-fun canSplitText(line: String, dictionary: Set<String>): Boolean {
+fun canSplitText(line: String, trie: Trie): Boolean {
 	val n = line.length
 	val dp = BooleanArray(n + 1)
 	dp[0] = true
 
-	for (i in 1..n) {
-		for (word in dictionary) {
-			val len = word.length
-			if (i - len >= 0 && dp[i - len]) {
-				if (line.substring(i - len, i) == word) {
-					dp[i] = true
-					break
-				}
-			}
+	for (i in 0 until n) {
+		if (!dp[i]) continue
+		for (end in trie.findWordsFrom(line, i)) {
+			dp[end] = true
 		}
 	}
+
 	return dp[n]
 }
 
 private fun readInt() = readln().toInt()
+
+class Trie {
+	private val root = TrieNode()
+
+	fun add(word: String) {
+		var current = root
+		for (char in word) {
+			current = current.children.getOrPut(char) { TrieNode() }
+		}
+		current.isTerminal = true
+	}
+
+	fun findWordsFrom(line: String, start: Int): List<Int> {
+		val result = mutableListOf<Int>()
+		var current = root
+		for (i in start until line.length) {
+			val char = line[i]
+			current = current.children[char] ?: break
+			if (current.isTerminal) {
+				result.add(i + 1)
+			}
+		}
+		return result
+	}
+
+	private data class TrieNode(
+		val children: MutableMap<Char, TrieNode> = mutableMapOf(),
+		var isTerminal: Boolean = false
+	)
+}
